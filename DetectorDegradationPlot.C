@@ -8,9 +8,11 @@
 // -----------------------------------------------------------------------------
 
 
+const int N_EVENTS = 9000;
 const int N_SCENARIOS = 8;
-const int COLOR[] = {1, 4/*, 2, 8, 13, 9, 94, 6, 7*/};
-const int MARKER[] = {20, 24, 21, 25};
+const int COLOR[] = {1, 9/*, 2, 8, 13, 4, 94, 6, 7*/};
+const int MARKER[] = {20, 22, 24, 21, 25};
+const double MARKER_SIZE = 1.0;
 const std::string SCENARIO[] = {
   "No dead modules",      // 0
   "Kill L5 + 5% loss",    // 1
@@ -24,7 +26,7 @@ const std::string SCENARIO[] = {
 };
 
 
-void makePlot2(TH1F* h1, TH1F* h2, std::string l1, std::string l2, std::string f);
+void makeEffPlot(TH1F* h1, TH1F* h2, std::string l1, std::string l2, std::string f);
 void makeNTrkPtPlot(TH1F* h1, TH1F* h2, std::string l1, std::string l2, std::string f);
 void makeResidualIntervalPlot(TH1F* h1_68, TH1F* h1_90, TH1F* h2_68, TH1F* h2_90,
   std::string str_l1, std::string str_l2, std::string f);
@@ -49,33 +51,45 @@ void DetectorDegradationPlot() {
 
   for(int n = 0; n <= N_SCENARIOS; n++) {
 
-    std::string f_name = "fail_scenario_" + std::to_string(n) + "_e100/output_TTbar_PU200_D76.root";
+    std::string f_name = "results/fail_scenario_" + std::to_string(n) + "_e" + std::to_string(N_EVENTS) + "/output_TTbar_PU200_D76.root";
     TFile* f = TFile::Open(f_name.c_str());
 
     h_name = "eff_eta_" + std::to_string(n);
     h[h_name] = f->Get<TH1F>("eff_eta");
     h[h_name]->SetMinimum(0.0);
     h[h_name]->SetMaximum(1.1);
-    h[h_name]->SetMarkerStyle(n == 0 ? 20 : 21);
+    h[h_name]->SetLineColor(n == 0 ? COLOR[0] : COLOR[1]);
+    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[0] : MARKER[1]);
+    h[h_name]->SetMarkerSize(MARKER_SIZE);
     h[h_name]->SetMarkerColor(n == 0 ? COLOR[0] : COLOR[1]);
 
     h_name = "ntrk_pt3_" + std::to_string(n);
     h[h_name] = f->Get<TH1F>("ntrk_pt3");
-    h[h_name]->SetMarkerStyle(n == 0 ? 20 : 21);
+    h[h_name]->Scale(1.0 / N_EVENTS);
+    h[h_name]->GetYaxis()->SetTitle("Fraction of events");
+    h[h_name]->SetLineColor(n == 0 ? COLOR[0] : COLOR[1]);
+    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[0] : MARKER[1]);
+    h[h_name]->SetMarkerSize(MARKER_SIZE);
     h[h_name]->SetMarkerColor(n == 0 ? COLOR[0] : COLOR[1]);
 
     h_name = "resVsEta_z0_68_" + std::to_string(n);
     h[h_name] = f->Get<TH1F>("resVsEta_z0_68");
+    h[h_name]->GetXaxis()->SetRangeUser(0.0, 2.4);
     h[h_name]->SetMinimum(0.0);
     h[h_name]->SetMaximum(2.0);
-    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[0] : MARKER[2]);
+    h[h_name]->SetLineColor(n == 0 ? COLOR[0] : COLOR[1]);
+    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[0] : MARKER[3]);
+    h[h_name]->SetMarkerSize(MARKER_SIZE);
     h[h_name]->SetMarkerColor(n == 0 ? COLOR[0] : COLOR[1]);
 
     h_name = "resVsEta_z0_90_" + std::to_string(n);
     h[h_name] = f->Get<TH1F>("resVsEta_z0_90");
+    h[h_name]->GetXaxis()->SetRangeUser(0.0, 2.4);
     h[h_name]->SetMinimum(0.0);
     h[h_name]->SetMaximum(2.0);
-    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[1] : MARKER[3]);
+    h[h_name]->SetLineColor(n == 0 ? COLOR[0] : COLOR[1]);
+    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[2] : MARKER[4]);
+    h[h_name]->SetMarkerSize(MARKER_SIZE);
     h[h_name]->SetMarkerColor(n == 0 ? COLOR[0] : COLOR[1]);
   }
 
@@ -83,7 +97,7 @@ void DetectorDegradationPlot() {
   for(int n = 1; n <= N_SCENARIOS; n++) {
 
     std::string str_n = std::to_string(n);
-    makePlot2(
+    makeEffPlot(
       h["eff_eta_0"], h["eff_eta_" + str_n],
       SCENARIO[0], SCENARIO[n], "eff_eta_0" + str_n);
   }
@@ -111,7 +125,7 @@ void DetectorDegradationPlot() {
 // -----------------------------------------------------------------------------
 
 
-void makePlot2(TH1F* h1, TH1F* h2, std::string l1, std::string l2, std::string f) {
+void makeEffPlot(TH1F* h1, TH1F* h2, std::string l1, std::string l2, std::string f) {
 
   TCanvas c;
 
@@ -128,7 +142,9 @@ void makePlot2(TH1F* h1, TH1F* h2, std::string l1, std::string l2, std::string f
   l->Draw();
 
   std::string f_name = "plots/" + f + ".pdf";
+  gPad->SetGridy();
   c.SaveAs(f_name.c_str());
+  gPad->SetGridy(0);
 
   delete l;
 }
@@ -153,8 +169,8 @@ void makeNTrkPtPlot(TH1F* h1, TH1F* h2, std::string l1, std::string l2, std::str
   std::string f_name = "plots/" + f + ".pdf";
   c.SaveAs(f_name.c_str());
 
-  gPad->SetLogy();
   f_name = "plots/" + f + "_log.pdf";
+  gPad->SetLogy();
   c.SaveAs(f_name.c_str());
   gPad->SetLogy(0);
 
@@ -171,11 +187,6 @@ void makeResidualIntervalPlot(TH1F* h1_68, TH1F* h1_90, TH1F* h2_68, TH1F* h2_90
   h1_90->Draw("p,same");
   h2_68->Draw("p,same");
   h2_90->Draw("p,same");
-
-  h1_68->GetXaxis()->SetRangeUser(0.0, 2.4);
-  h1_90->GetXaxis()->SetRangeUser(0.0, 2.4);
-  h2_68->GetXaxis()->SetRangeUser(0.0, 2.4);
-  h2_90->GetXaxis()->SetRangeUser(0.0, 2.4);
 
   TLegend* l1 = new TLegend(0.55, 0.55, 0.8, 0.85);
   l1->SetFillStyle(0);
