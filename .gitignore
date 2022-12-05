@@ -1,3 +1,4 @@
 .DS_Store
-*fail_scenario_*
-plots
+results/
+plots/
+comb_plots/
