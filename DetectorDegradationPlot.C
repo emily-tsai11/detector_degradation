@@ -8,31 +8,55 @@
 // -----------------------------------------------------------------------------
 
 
-const int N_EVENTS = 9000;
-const int N_SCENARIOS = 8;
 const int COLOR[] = {1, 9, 2, 8, 63, 15, 94, 6, 221};
 const int MARKER[] = {20, 22, 24, 21, 25};
 const double MARKER_SIZE = 1.0;
-const std::string SCENARIO[] = {
-  "No dead modules",      // 0
-  "Kill L5 + 5% loss",    // 1
-  "Kill L1 + 5% loss",    // 2
-  "Kill L1 + L2",         // 3
-  "Kill L1 + D1",         // 4
-  "5% loss",              // 5
-  "1% loss",              // 6
-  "Kill L5 + 1% loss",    // 7
-  "Kill L1 + 1% loss"     // 8
+
+const std::string SAMPLE[] = {
+  "TTbar_PU200_D76",                      // 0
+  "TTbar_noPU_D76"                        // 1
 };
+const std::string QUADRANT[] = {
+  "phi.0.pi2_z.-1000.0",                  // 0
+  "phi.0.pi2_z.0.1000"                    // 1
+};
+const vector<int> SCENARIOS[] = {
+  vector<int>{0, 1, 2, 3, 4, 5, 6, 7, 8}, // 0
+  vector<int>{1, 2, 3, 4, 5, 6, 7, 8},    // 1
+  vector<int>{6, 8},                      // 2
+  vector<int>{0}                          // 3
+};
+
+const std::string SAMPLE_P[] = {
+  "t#bar{t}, PU 200, D76",                // 0
+  "t#bar{t}, no PU, D76",                 // 1
+};
+const std::string QUADRANT_P[] = {
+  "#phi (0 #rightarrow #pi/2), z (-1000 #rightarrow 0)", // 0
+  "#phi (0 #rightarrow #pi/2), z (0 #rightarrow 1000)", // 1
+};
+const std::string SCENARIO_P[] = {
+  "No dead modules",                      // 0
+  "Kill L5 + 5% loss",                    // 1
+  "Kill L1 + 5% loss",                    // 2
+  "Kill L1 + L2",                         // 3
+  "Kill L1 + D1",                         // 4
+  "5% loss",                              // 5
+  "1% loss",                              // 6
+  "Kill L5 + 1% loss",                    // 7
+  "Kill L1 + 1% loss"                     // 8
+};
+
 
 // map for storing histograms
 std::map<std::string, TH1F*> h;
 
 
-void makeResidualIntervalPlot(vector<int> scenarios, std::string name, std::string type);
-void makeCombPlot(vector<int> scenarios, std::string name, std::string type, bool plot_log);
+void readHistograms(int sample, int quadrant, vector<int> scenarios, int n_events);
+void makeResidualIntervalPlot(int s, int q, vector<int> scenarios, std::string name, std::string type);
+void makeMultiPlot(int s, int q, vector<int> scenarios, std::string name, std::string type, bool plot_log);
 void setPlotStyle();
-// void MySmallText(Double_t x, Double_t y, Color_t color, char* text);
+void mySmallText(Double_t x, Double_t y, Color_t color, std::string text);
 
 
 // -----------------------------------------------------------------------------
@@ -47,84 +71,132 @@ void DetectorDegradationPlot() {
   setPlotStyle();
 
   // read in histograms and set attributes
-  std::string h_name, f_name;
-  for(int n = 0; n <= N_SCENARIOS; n++) {
-
-    f_name = "results/fail_scenario_" + std::to_string(n) + "_e" + std::to_string(N_EVENTS) + "/output_TTbar_PU200_D76.root";
-    TFile* f = TFile::Open(f_name.c_str());
-
-    h_name = "eff_eta_" + std::to_string(n);
-    h[h_name] = f->Get<TH1F>("eff_eta");
-    h[h_name]->SetMinimum(0.0);
-    h[h_name]->SetMaximum(1.1);
-    h[h_name]->SetLineColor(COLOR[n]);
-    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[0] : MARKER[1]);
-    h[h_name]->SetMarkerSize(MARKER_SIZE);
-    h[h_name]->SetMarkerColor(COLOR[n]);
-
-    h_name = "ntrk_pt3_" + std::to_string(n);
-    h[h_name] = f->Get<TH1F>("ntrk_pt3");
-    h[h_name]->Scale(1.0 / N_EVENTS);
-    h[h_name]->GetYaxis()->SetTitle("Fraction of events");
-    h[h_name]->SetLineColor(COLOR[n]);
-    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[0] : MARKER[1]);
-    h[h_name]->SetMarkerSize(MARKER_SIZE);
-    h[h_name]->SetMarkerColor(COLOR[n]);
-
-    h_name = "resVsEta_z0_68_" + std::to_string(n);
-    h[h_name] = f->Get<TH1F>("resVsEta_z0_68");
-    h[h_name]->GetXaxis()->SetRangeUser(0.0, 2.4);
-    h[h_name]->SetMinimum(0.0);
-    h[h_name]->SetMaximum(2.0);
-    h[h_name]->SetLineColor(COLOR[n]);
-    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[0] : MARKER[3]);
-    h[h_name]->SetMarkerSize(MARKER_SIZE);
-    h[h_name]->SetMarkerColor(COLOR[n]);
-
-    h_name = "resVsEta_z0_90_" + std::to_string(n);
-    h[h_name] = f->Get<TH1F>("resVsEta_z0_90");
-    h[h_name]->GetXaxis()->SetRangeUser(0.0, 2.4);
-    h[h_name]->SetMinimum(0.0);
-    h[h_name]->SetMaximum(2.0);
-    h[h_name]->SetLineColor(COLOR[n]);
-    h[h_name]->SetMarkerStyle(n == 0 ? MARKER[2] : MARKER[4]);
-    h[h_name]->SetMarkerSize(MARKER_SIZE);
-    h[h_name]->SetMarkerColor(COLOR[n]);
-  }
+  readHistograms(0, 0, SCENARIOS[0], 9000);
+  readHistograms(0, 1, SCENARIOS[2], 9000);
+  // readHistograms(1, 0, SCENARIOS[3], 10000);
 
   // make eta efficiency plots
-  for(int n = 1; n <= N_SCENARIOS; n++)
-    makeCombPlot((vector<int>) {0, n}, "eff_eta", "0" + std::to_string(n), false);
+  for(auto &is : SCENARIOS[1])
+    makeMultiPlot(0, 0, (vector<int>) {0, is}, "eff_eta", "f0" + std::to_string(is), false);
 
   // make # of tracks with pT > 3 GeV plots
-  for(int n = 1; n <= N_SCENARIOS; n++)
-    makeCombPlot((vector<int>) {0, n}, "ntrk_pt3", "0" + std::to_string(n), true);
+  for(auto &is : SCENARIOS[1])
+    makeMultiPlot(0, 0, (vector<int>) {0, is}, "ntrk_pt3", "f0" + std::to_string(is), true);
 
   // make z0 residual vs. eta interval plots
-  for(int n = 1; n <= N_SCENARIOS; n++)
-    makeResidualIntervalPlot((vector<int>) {0, n}, "resVsEta", "z0");
+  for(auto &is : SCENARIOS[1])
+    makeResidualIntervalPlot(0, 0, (vector<int>) {0, is}, "resVsEta_z0", "f0" + std::to_string(is));
 
   // make 1% loss plots
-  makeCombPlot((vector<int>) {0, 6, 7, 8}, "eff_eta", "1loss", false);
-  makeCombPlot((vector<int>) {0, 6, 7, 8}, "ntrk_pt3", "1loss", true);
+  makeMultiPlot(0, 0, (vector<int>) {0, 6, 7, 8}, "eff_eta", "1loss", false);
+  makeMultiPlot(0, 0, (vector<int>) {0, 6, 7, 8}, "ntrk_pt3", "1loss", true);
 
   // make 5% loss plots
-  makeCombPlot((vector<int>) {0, 5, 1, 2}, "eff_eta", "5loss", false);
-  makeCombPlot((vector<int>) {0, 5, 1, 2}, "ntrk_pt3", "5loss", true);
+  makeMultiPlot(0, 0, (vector<int>) {0, 5, 1, 2}, "eff_eta", "5loss", false);
+  makeMultiPlot(0, 0, (vector<int>) {0, 5, 1, 2}, "ntrk_pt3", "5loss", true);
 
   // make kill L1 plots
-  makeCombPlot((vector<int>) {0, 3, 4, 8, 2}, "eff_eta", "killL1", false);
-  makeCombPlot((vector<int>) {0, 3, 4, 8, 2}, "ntrk_pt3", "killL1", true);
+  makeMultiPlot(0, 0, (vector<int>) {0, 3, 4, 8, 2}, "eff_eta", "killL1", false);
+  makeMultiPlot(0, 0, (vector<int>) {0, 3, 4, 8, 2}, "ntrk_pt3", "killL1", true);
 
   // make kill L5 plots
-  makeCombPlot((vector<int>) {0, 7, 1}, "eff_eta", "killL5", false);
-  makeCombPlot((vector<int>) {0, 7, 1}, "ntrk_pt3", "killL5", true);
+  makeMultiPlot(0, 0, (vector<int>) {0, 7, 1}, "eff_eta", "killL5", false);
+  makeMultiPlot(0, 0, (vector<int>) {0, 7, 1}, "ntrk_pt3", "killL5", true);
+
+  // make eta efficiency plot for different quadrants
+  for(auto& is : SCENARIOS[2])
+  {
+    std::string ss = std::to_string(is);
+
+    TCanvas c;
+
+    TLegend* l = new TLegend(0.5, 0.25, 0.85, 0.55);
+    l->SetFillStyle(0);
+    l->SetBorderSize(0);
+    l->SetTextSize(0.04);
+    l->SetTextFont(42);
+
+    h["eff_eta_0_1_" + ss]->SetLineColor(63);
+    h["eff_eta_0_1_" + ss]->SetMarkerColor(63);
+
+    h["eff_eta_0_0_0"]->Draw("p");
+    h["eff_eta_0_0_" + ss]->Draw("p,same");
+    h["eff_eta_0_1_" + ss]->Draw("p,same");
+
+    l->AddEntry(h["eff_eta_0_0_0"], SCENARIO_P[0].c_str(), "pl");
+    l->AddEntry(h["eff_eta_0_0_" + ss], QUADRANT_P[0].c_str(), "pl");
+    l->AddEntry(h["eff_eta_0_1_" + ss], QUADRANT_P[1].c_str(), "pl");
+
+    l->Draw();
+
+    mySmallText(0.2, 0.5, 1, SAMPLE_P[0]);
+    mySmallText(0.2, 0.4, 1, SCENARIO_P[is]);
+
+    std::string f_name = "plots/" + SAMPLE[0] + "/eff_eta_q01_f0" + ss + ".pdf";
+    gPad->SetGridy();
+    c.SaveAs(f_name.c_str());
+    gPad->SetGridy(0);
+
+    delete l;
+  }
 }
 
 // -----------------------------------------------------------------------------
 
 
-void makeResidualIntervalPlot(vector<int> scenarios, std::string name, std::string type) {
+void readHistograms(int s, int q, vector<int> scenarios, int n) {
+
+  std::string h_name, f_name;
+  std::string suffix = "_" + std::to_string(s) + "_" + std::to_string(q) + "_";
+
+  for(auto &is : scenarios) {
+
+    f_name = "results/" + SAMPLE[s] + "/" + QUADRANT[q] + "/f" + std::to_string(is)
+      + "_e" + std::to_string(n) + "/output_" + SAMPLE[s] + ".root";
+    TFile* f = TFile::Open(f_name.c_str());
+
+    h_name = "eff_eta" + suffix + std::to_string(is);
+    h[h_name] = f->Get<TH1F>("eff_eta");
+    h[h_name]->SetMinimum(0.0);
+    h[h_name]->SetMaximum(1.1);
+    h[h_name]->SetLineColor(COLOR[is]);
+    h[h_name]->SetMarkerStyle(is == 0 ? MARKER[0] : MARKER[1]);
+    h[h_name]->SetMarkerSize(MARKER_SIZE);
+    h[h_name]->SetMarkerColor(COLOR[is]);
+
+    h_name = "ntrk_pt3" + suffix + std::to_string(is);
+    h[h_name] = f->Get<TH1F>("ntrk_pt3");
+    h[h_name]->Scale(1.0 / n);
+    h[h_name]->GetYaxis()->SetTitle("Fraction of events");
+    h[h_name]->SetLineColor(COLOR[is]);
+    h[h_name]->SetMarkerStyle(s == 0 ? MARKER[0] : MARKER[1]);
+    h[h_name]->SetMarkerSize(MARKER_SIZE);
+    h[h_name]->SetMarkerColor(COLOR[is]);
+
+    h_name = "resVsEta_z0_68" + suffix + std::to_string(is);
+    h[h_name] = f->Get<TH1F>("resVsEta_z0_68");
+    h[h_name]->GetXaxis()->SetRangeUser(0.0, 2.4);
+    h[h_name]->SetMinimum(0.0);
+    h[h_name]->SetMaximum(2.0);
+    h[h_name]->SetLineColor(COLOR[is]);
+    h[h_name]->SetMarkerStyle(s == 0 ? MARKER[0] : MARKER[3]);
+    h[h_name]->SetMarkerSize(MARKER_SIZE);
+    h[h_name]->SetMarkerColor(COLOR[is]);
+
+    h_name = "resVsEta_z0_90" + suffix + std::to_string(is);
+    h[h_name] = f->Get<TH1F>("resVsEta_z0_90");
+    h[h_name]->GetXaxis()->SetRangeUser(0.0, 2.4);
+    h[h_name]->SetMinimum(0.0);
+    h[h_name]->SetMaximum(2.0);
+    h[h_name]->SetLineColor(COLOR[is]);
+    h[h_name]->SetMarkerStyle(s == 0 ? MARKER[2] : MARKER[4]);
+    h[h_name]->SetMarkerSize(MARKER_SIZE);
+    h[h_name]->SetMarkerColor(COLOR[is]);
+  }
+}
+
+
+void makeResidualIntervalPlot(int s, int q, vector<int> scenarios, std::string name, std::string type) {
 
   TCanvas c;
 
@@ -140,27 +212,25 @@ void makeResidualIntervalPlot(vector<int> scenarios, std::string name, std::stri
   l2->SetTextSize(0.04);
   l2->SetTextFont(42);
 
-  int n_scenarios = scenarios.size();
-  for(int s = 0; s < n_scenarios; s++) {
-    int is = scenarios[s];
-    std::string ss = std::to_string(is);
-    std::string h68 = name + "_" + type + "_68_" + ss;
-    std::string h90 = name + "_" + type + "_90_" + ss;
+  std::string suffix = "_" + std::to_string(s) + "_" + std::to_string(q) + "_";
+  bool drawn = false;
+  for(auto &is : scenarios) {
+    std::string h68 = name + "_68" + suffix + std::to_string(is);
+    std::string h90 = name + "_90" + suffix + std::to_string(is);
     h[h68]->Draw("p,same");
     h[h90]->Draw("p,same");
-    l1->AddEntry(h[h68], SCENARIO[is].c_str(), "pl");
-    if(s == 0) {
+    l1->AddEntry(h[h68], SCENARIO_P[is].c_str(), "pl");
+    if(!drawn) {
       l2->AddEntry(h[h68], "68%", "p");
       l2->AddEntry(h[h90], "90%", "p");
+      drawn = true;
     }
   }
 
   l1->Draw();
   l2->Draw();
 
-  std::string f_name = "comb_plots/" + type + "_" + name + "_interval_";
-  for(int s = 0; s < n_scenarios; s++) f_name += std::to_string(scenarios[s]);
-  f_name += ".pdf";
+  std::string f_name = "plots/" + SAMPLE[s] + "/" + QUADRANT[q] + "/" + name + "_interval_" + type + ".pdf";
   c.SaveAs(f_name.c_str());
 
   delete l1;
@@ -168,7 +238,7 @@ void makeResidualIntervalPlot(vector<int> scenarios, std::string name, std::stri
 }
 
 
-void makeCombPlot(vector<int> scenarios, std::string name, std::string type, bool plot_log) {
+void makeMultiPlot(int s, int q, vector<int> scenarios, std::string name, std::string type, bool plot_log) {
 
   TCanvas c;
 
@@ -178,26 +248,23 @@ void makeCombPlot(vector<int> scenarios, std::string name, std::string type, boo
   l->SetTextSize(0.04);
   l->SetTextFont(42);
 
-  int n_scenarios = scenarios.size();
-  for(int s = 0; s < n_scenarios; s++) {
-    int is = scenarios[s];
-    std::string ss = std::to_string(is);
-    std::string hname = name + "_" + ss;
-    h[hname]->Draw("p,same");
-    l->AddEntry(h[hname], SCENARIO[is].c_str(), "pl");
+  std::string suffix = "_" + std::to_string(s) + "_" + std::to_string(q) + "_";
+  for(auto &is : scenarios) {
+    std::string h_name = name + suffix + std::to_string(is);
+    h[h_name]->Draw("p,same");
+    l->AddEntry(h[h_name], SCENARIO_P[is].c_str(), "pl");
   }
 
   l->Draw();
 
-  std::string f_name = "comb_plots/" + name + "_" + type + ".pdf";
+  std::string f_name = "plots/" + SAMPLE[s] + "/" + QUADRANT[q] + "/" + name + "_" + type;
   gPad->SetGridy();
-  c.SaveAs(f_name.c_str());
+  c.SaveAs((f_name + ".pdf").c_str());
   gPad->SetGridy(0);
 
   if(plot_log) {
-    f_name = "comb_plots/" + name + "_" + type + "_log.pdf";
     gPad->SetLogy();
-    c.SaveAs(f_name.c_str());
+    c.SaveAs((f_name + "_log.pdf").c_str());
     gPad->SetLogy(0);
   }
 
@@ -267,12 +334,12 @@ void setPlotStyle() {
 }
 
 
-// void MySmallText(Double_t x, Double_t y, Color_t color, char* text) {
-//
-//   Double_t tsize = 0.044;
-//   TLatex l;
-//   l.SetTextSize(tsize);
-//   l.SetNDC();
-//   l.SetTextColor(color);
-//   l.DrawLatex(x, y, text);
-// }
+void mySmallText(Double_t x, Double_t y, Color_t color, std::string text) {
+
+  Double_t tsize = 0.044;
+  TLatex l;
+  l.SetTextSize(tsize);
+  l.SetNDC();
+  l.SetTextColor(color);
+  l.DrawLatex(x, y, text.c_str());
+}
