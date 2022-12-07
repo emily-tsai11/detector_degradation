@@ -13,12 +13,12 @@ const int MARKER[] = {20, 22, 24, 21, 25};
 const double MARKER_SIZE = 1.0;
 
 const std::string SAMPLE[] = {
-  "TTbar_PU200_D76",                      // 0
-  "TTbar_noPU_D76"                        // 1
+  "TTbar_PU200_D76", // 0
+  "TTbar_noPU_D76"   // 1
 };
 const std::string QUADRANT[] = {
-  "phi.0.pi2_z.-1000.0",                  // 0
-  "phi.0.pi2_z.0.1000"                    // 1
+  "phi.0.pi2_z.-1000.0", // 0
+  "phi.0.pi2_z.0.1000"   // 1
 };
 const vector<int> SCENARIOS[] = {
   vector<int>{0, 1, 2, 3, 4, 5, 6, 7, 8}, // 0
@@ -28,23 +28,23 @@ const vector<int> SCENARIOS[] = {
 };
 
 const std::string SAMPLE_P[] = {
-  "t#bar{t}, PU 200, D76",                // 0
-  "t#bar{t}, no PU, D76",                 // 1
+  "t#bar{t}, PU 200, D76", // 0
+  "t#bar{t}, no PU, D76",  // 1
 };
 const std::string QUADRANT_P[] = {
   "#phi (0 #rightarrow #pi/2), z (-1000 #rightarrow 0)", // 0
-  "#phi (0 #rightarrow #pi/2), z (0 #rightarrow 1000)", // 1
+  "#phi (0 #rightarrow #pi/2), z (0 #rightarrow 1000)",  // 1
 };
 const std::string SCENARIO_P[] = {
-  "No dead modules",                      // 0
-  "Kill L5 + 5% loss",                    // 1
-  "Kill L1 + 5% loss",                    // 2
-  "Kill L1 + L2",                         // 3
-  "Kill L1 + D1",                         // 4
-  "5% loss",                              // 5
-  "1% loss",                              // 6
-  "Kill L5 + 1% loss",                    // 7
-  "Kill L1 + 1% loss"                     // 8
+  "No dead modules",   // 0
+  "Kill L5 + 5% loss", // 1
+  "Kill L1 + 5% loss", // 2
+  "Kill L1 + L2",      // 3
+  "Kill L1 + D1",      // 4
+  "5% loss",           // 5
+  "1% loss",           // 6
+  "Kill L5 + 1% loss", // 7
+  "Kill L1 + 1% loss"  // 8
 };
 
 
