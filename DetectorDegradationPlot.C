@@ -20,12 +20,6 @@ const std::string QUADRANT[] = {
   "phi.0.pi2_z.-1000.0", // 0
   "phi.0.pi2_z.0.1000"   // 1
 };
-const vector<int> SCENARIOS[] = {
-  vector<int>{0, 1, 2, 3, 4, 5, 6, 7, 8}, // 0
-  vector<int>{1, 2, 3, 4, 5, 6, 7, 8},    // 1
-  vector<int>{6, 8},                      // 2
-  vector<int>{0}                          // 3
-};
 
 const std::string SAMPLE_P[] = {
   "t#bar{t}, PU 200, D76", // 0
@@ -47,14 +41,20 @@ const std::string SCENARIO_P[] = {
   "Kill L1 + 1% loss"  // 8
 };
 
+// FORMAT: sample_quadrant_failScenario
+
+
+bool debug = 0;
+
 
 // map for storing histograms
 std::map<std::string, TH1F*> h;
 
 
-void readHistograms(int sample, int quadrant, vector<int> scenarios, int n_events);
+void copyHistEntries(TH1F* h_ret, TH1F* h_copy, int n_bins);
+void readHistograms(int s, int q, vector<int> scenarios, int n, bool truncation);
 void makeResidualIntervalPlot(int s, int q, vector<int> scenarios, std::string name, std::string type);
-void makeMultiPlot(int s, int q, vector<int> scenarios, std::string name, std::string type, bool plot_log);
+void makeMultiPlot(int s, int q, vector<int> scenarios, std::string name, std::string type, bool plot_log, bool truncation);
 void setPlotStyle();
 void mySmallText(Double_t x, Double_t y, Color_t color, std::string text);
 
@@ -71,40 +71,236 @@ void DetectorDegradationPlot() {
   setPlotStyle();
 
   // read in histograms and set attributes
-  readHistograms(0, 0, SCENARIOS[0], 9000);
-  readHistograms(0, 1, SCENARIOS[2], 9000);
-  // readHistograms(1, 0, SCENARIOS[3], 10000);
+  readHistograms(0, 0, {0, 1, 2, 3, 4, 5, 6, 7, 8}, 9000, true);
+  readHistograms(0, 0, {0, 6}, 9000, false); // not truncated
+  readHistograms(0, 1, {2, 5, 6, 8}, 9000, true);
+  readHistograms(1, 0, {0, 1, 2, 3, 4, 5, 6, 7, 8}, 9000, true);
+  readHistograms(1, 0, {0, 6}, 9000, false); // not truncated
 
   // make eta efficiency plots
-  for(auto &is : SCENARIOS[1])
-    makeMultiPlot(0, 0, (vector<int>) {0, is}, "eff_eta", "f0" + std::to_string(is), false);
+  for(auto &is : {1, 2, 3, 4, 5, 6, 7, 8})
+    makeMultiPlot(0, 0, {0, is}, "eff_eta", "f0" + std::to_string(is), false, true);
+  for(auto &is : {6})
+    makeMultiPlot(0, 0, {0, is}, "eff_eta", "f0" + std::to_string(is), false, false);
+  for(auto &is : {1, 2, 3, 4, 5, 6, 7, 8})
+    makeMultiPlot(1, 0, {0, is}, "eff_eta", "f0" + std::to_string(is), false, true);
+  for(auto &is : {6})
+    makeMultiPlot(1, 0, {0, is}, "eff_eta", "f0" + std::to_string(is), false, false);
+
+  // TTBar PU200
+  // make zoomed eta efficiency plots for failure scenario 6, with truncation
+  {
+    TCanvas c;
+
+    TLegend* l = new TLegend(0.45, 0.2, 0.75, 0.4);
+    l->SetFillStyle(0);
+    l->SetBorderSize(0);
+    l->SetTextSize(0.04);
+    l->SetTextFont(42);
+
+    h["eff_eta_0_0_6"]->SetLineColor(221);
+    h["eff_eta_0_0_6"]->SetMarkerColor(221);
+
+    h["eff_eta_0_0_0"]->SetMinimum(0.84);
+    h["eff_eta_0_0_0"]->SetMaximum(1.0);
+
+    h["eff_eta_0_0_6"]->SetMinimum(0.84);
+    h["eff_eta_0_0_6"]->SetMaximum(1.0);
+
+    h["eff_eta_0_0_0"]->Draw("p");
+    h["eff_eta_0_0_6"]->Draw("p,same");
+
+    l->AddEntry(h["eff_eta_0_0_0"], SCENARIO_P[0].c_str(), "pl");
+    l->AddEntry(h["eff_eta_0_0_6"], SCENARIO_P[6].c_str(), "pl");
+
+    l->Draw();
+
+    mySmallText(0.2, 0.28, 1, "Truncated");
+
+    std::string f_name = "plots/" + SAMPLE[0] + "/" + QUADRANT[0] + "/eff_eta_f06_zoom.pdf";
+    gPad->SetGridy();
+    c.SaveAs(f_name.c_str());
+    gPad->SetGridy(0);
+
+    delete l;
+
+    h["eff_eta_0_0_0"]->SetMinimum(0.0);
+    h["eff_eta_0_0_0"]->SetMaximum(1.1);
+
+    h["eff_eta_0_0_6"]->SetMinimum(0.0);
+    h["eff_eta_0_0_6"]->SetMaximum(1.1);
+  }
+  // make zoomed eta efficiency plots for failure scenario 6, without truncation
+  {
+    TCanvas c;
+
+    TLegend* l = new TLegend(0.45, 0.2, 0.75, 0.4);
+    l->SetFillStyle(0);
+    l->SetBorderSize(0);
+    l->SetTextSize(0.04);
+    l->SetTextFont(42);
+
+    h["eff_eta_0_0_6_noTrunc"]->SetLineColor(221);
+    h["eff_eta_0_0_6_noTrunc"]->SetMarkerColor(221);
+
+    h["eff_eta_0_0_0_noTrunc"]->SetMinimum(0.84);
+    h["eff_eta_0_0_0_noTrunc"]->SetMaximum(1.0);
+
+    h["eff_eta_0_0_6_noTrunc"]->SetMinimum(0.84);
+    h["eff_eta_0_0_6_noTrunc"]->SetMaximum(1.0);
+
+    h["eff_eta_0_0_0_noTrunc"]->Draw("p");
+    h["eff_eta_0_0_6_noTrunc"]->Draw("p,same");
+
+    l->AddEntry(h["eff_eta_0_0_0_noTrunc"], SCENARIO_P[0].c_str(), "pl");
+    l->AddEntry(h["eff_eta_0_0_6_noTrunc"], SCENARIO_P[6].c_str(), "pl");
+
+    l->Draw();
+
+    mySmallText(0.2, 0.28, 1, "Not truncated");
+
+    std::string f_name = "plots/" + SAMPLE[1] + "/" + QUADRANT[0] + "/eff_eta_f06_noTrunc_zoom.pdf";
+    gPad->SetGridy();
+    c.SaveAs(f_name.c_str());
+    gPad->SetGridy(0);
+
+    delete l;
+
+    h["eff_eta_0_0_0_noTrunc"]->SetMinimum(0.0);
+    h["eff_eta_0_0_0_noTrunc"]->SetMaximum(1.1);
+
+    h["eff_eta_0_0_6_noTrunc"]->SetMinimum(0.0);
+    h["eff_eta_0_0_6_noTrunc"]->SetMaximum(1.1);
+  }
+
+  // TTBar noPU
+  // make zoomed eta efficiency plots for failure scenario 6, with truncation
+  {
+    TCanvas c;
+
+    TLegend* l = new TLegend(0.45, 0.2, 0.75, 0.4);
+    l->SetFillStyle(0);
+    l->SetBorderSize(0);
+    l->SetTextSize(0.04);
+    l->SetTextFont(42);
+
+    h["eff_eta_1_0_6"]->SetLineColor(221);
+    h["eff_eta_1_0_6"]->SetMarkerColor(221);
+
+    h["eff_eta_1_0_0"]->SetMinimum(0.84);
+    h["eff_eta_1_0_0"]->SetMaximum(1.0);
+
+    h["eff_eta_1_0_6"]->SetMinimum(0.84);
+    h["eff_eta_1_0_6"]->SetMaximum(1.0);
+
+    h["eff_eta_1_0_0"]->Draw("p");
+    h["eff_eta_1_0_6"]->Draw("p,same");
+
+    l->AddEntry(h["eff_eta_1_0_0"], SCENARIO_P[0].c_str(), "pl");
+    l->AddEntry(h["eff_eta_1_0_6"], SCENARIO_P[6].c_str(), "pl");
+
+    l->Draw();
+
+    mySmallText(0.2, 0.28, 1, "Truncated");
+
+    std::string f_name = "plots/" + SAMPLE[1] + "/" + QUADRANT[0] + "/eff_eta_f06_zoom.pdf";
+    gPad->SetGridy();
+    c.SaveAs(f_name.c_str());
+    gPad->SetGridy(0);
+
+    delete l;
+
+    h["eff_eta_1_0_0"]->SetMinimum(0.0);
+    h["eff_eta_1_0_0"]->SetMaximum(1.1);
+
+    h["eff_eta_1_0_6"]->SetMinimum(0.0);
+    h["eff_eta_1_0_6"]->SetMaximum(1.1);
+  }
+  // make zoomed eta efficiency plots for failure scenario 6, without truncation
+  {
+    TCanvas c;
+
+    TLegend* l = new TLegend(0.45, 0.2, 0.75, 0.4);
+    l->SetFillStyle(0);
+    l->SetBorderSize(0);
+    l->SetTextSize(0.04);
+    l->SetTextFont(42);
+
+    h["eff_eta_0_0_6_noTrunc"]->SetLineColor(221);
+    h["eff_eta_0_0_6_noTrunc"]->SetMarkerColor(221);
+
+    h["eff_eta_0_0_0_noTrunc"]->SetMinimum(0.84);
+    h["eff_eta_0_0_0_noTrunc"]->SetMaximum(1.0);
+
+    h["eff_eta_0_0_6_noTrunc"]->SetMinimum(0.84);
+    h["eff_eta_0_0_6_noTrunc"]->SetMaximum(1.0);
+
+    h["eff_eta_0_0_0_noTrunc"]->Draw("p");
+    h["eff_eta_0_0_6_noTrunc"]->Draw("p,same");
+
+    l->AddEntry(h["eff_eta_0_0_0_noTrunc"], SCENARIO_P[0].c_str(), "pl");
+    l->AddEntry(h["eff_eta_0_0_6_noTrunc"], SCENARIO_P[6].c_str(), "pl");
+
+    l->Draw();
+
+    mySmallText(0.2, 0.28, 1, "Not truncated");
+
+    std::string f_name = "plots/" + SAMPLE[0] + "/" + QUADRANT[0] + "/eff_eta_f06_noTrunc_zoom.pdf";
+    gPad->SetGridy();
+    c.SaveAs(f_name.c_str());
+    gPad->SetGridy(0);
+
+    delete l;
+
+    h["eff_eta_0_0_0_noTrunc"]->SetMinimum(0.0);
+    h["eff_eta_0_0_0_noTrunc"]->SetMaximum(1.1);
+
+    h["eff_eta_0_0_6_noTrunc"]->SetMinimum(0.0);
+    h["eff_eta_0_0_6_noTrunc"]->SetMaximum(1.1);
+  }
 
   // make # of tracks with pT > 3 GeV plots
-  for(auto &is : SCENARIOS[1])
-    makeMultiPlot(0, 0, (vector<int>) {0, is}, "ntrk_pt3", "f0" + std::to_string(is), true);
+  for(auto &is : {1, 2, 3, 4, 5, 6, 7, 8})
+    makeMultiPlot(0, 0, {0, is}, "ntrk_pt3", "f0" + std::to_string(is), true, true);
+  for(auto &is : {1, 2, 3, 4, 5, 6, 7, 8})
+    makeMultiPlot(1, 0, {0, is}, "ntrk_pt3", "f0" + std::to_string(is), true, true);
 
   // make z0 residual vs. eta interval plots
-  for(auto &is : SCENARIOS[1])
-    makeResidualIntervalPlot(0, 0, (vector<int>) {0, is}, "resVsEta_z0", "f0" + std::to_string(is));
+  for(auto &is : {1, 2, 3, 4, 5, 6, 7, 8})
+    makeResidualIntervalPlot(0, 0, {0, is}, "resVsEta_z0", "f0" + std::to_string(is));
+  for(auto &is : {1, 2, 3, 4, 5, 6, 7, 8})
+    makeResidualIntervalPlot(1, 0, {0, is}, "resVsEta_z0", "f0" + std::to_string(is));
 
   // make 1% loss plots
-  makeMultiPlot(0, 0, (vector<int>) {0, 6, 7, 8}, "eff_eta", "1loss", false);
-  makeMultiPlot(0, 0, (vector<int>) {0, 6, 7, 8}, "ntrk_pt3", "1loss", true);
+  makeMultiPlot(0, 0, {0, 6, 7, 8}, "eff_eta", "1loss", false, true);
+  makeMultiPlot(0, 0, {0, 6, 7, 8}, "ntrk_pt3", "1loss", true, true);
+
+  makeMultiPlot(1, 0, {0, 6, 7, 8}, "eff_eta", "1loss", false, true);
+  makeMultiPlot(1, 0, {0, 6, 7, 8}, "ntrk_pt3", "1loss", true, true);
 
   // make 5% loss plots
-  makeMultiPlot(0, 0, (vector<int>) {0, 5, 1, 2}, "eff_eta", "5loss", false);
-  makeMultiPlot(0, 0, (vector<int>) {0, 5, 1, 2}, "ntrk_pt3", "5loss", true);
+  makeMultiPlot(0, 0, {0, 5, 1, 2}, "eff_eta", "5loss", false, true);
+  makeMultiPlot(0, 0, {0, 5, 1, 2}, "ntrk_pt3", "5loss", true, true);
+
+  makeMultiPlot(1, 0, {0, 5, 1, 2}, "eff_eta", "5loss", false, true);
+  makeMultiPlot(1, 0, {0, 5, 1, 2}, "ntrk_pt3", "5loss", true, true);
 
   // make kill L1 plots
-  makeMultiPlot(0, 0, (vector<int>) {0, 3, 4, 8, 2}, "eff_eta", "killL1", false);
-  makeMultiPlot(0, 0, (vector<int>) {0, 3, 4, 8, 2}, "ntrk_pt3", "killL1", true);
+  makeMultiPlot(0, 0, {0, 3, 4, 8, 2}, "eff_eta", "killL1", false, true);
+  makeMultiPlot(0, 0, {0, 3, 4, 8, 2}, "ntrk_pt3", "killL1", true, true);
+
+  makeMultiPlot(1, 0, {0, 3, 4, 8, 2}, "eff_eta", "killL1", false, true);
+  makeMultiPlot(1, 0, {0, 3, 4, 8, 2}, "ntrk_pt3", "killL1", true, true);
 
   // make kill L5 plots
-  makeMultiPlot(0, 0, (vector<int>) {0, 7, 1}, "eff_eta", "killL5", false);
-  makeMultiPlot(0, 0, (vector<int>) {0, 7, 1}, "ntrk_pt3", "killL5", true);
+  makeMultiPlot(0, 0, {0, 7, 1}, "eff_eta", "killL5", false, true);
+  makeMultiPlot(0, 0, {0, 7, 1}, "ntrk_pt3", "killL5", true, true);
+
+  makeMultiPlot(1, 0, {0, 7, 1}, "eff_eta", "killL5", false, true);
+  makeMultiPlot(1, 0, {0, 7, 1}, "ntrk_pt3", "killL5", true, true);
 
   // make eta efficiency plot for different quadrants
-  for(auto& is : SCENARIOS[2])
+  for(auto& is : {2, 5, 6, 8})
   {
     std::string ss = std::to_string(is);
 
@@ -139,23 +335,82 @@ void DetectorDegradationPlot() {
 
     delete l;
   }
+
+  // look at track eta disributions for 1% loss
+  for(auto match : {"match_", ""}) {
+    for(auto& trunc : {"", "_noTrunc"}) {
+      for(auto& is : {0, 1}) { // iterate through samples, not scenarios
+
+        std::string ss = std::to_string(is);
+        std::string h_name;
+
+        TCanvas c;
+
+        TLegend* l = new TLegend(0.5, 0.25, 0.85, 0.55);
+        l->SetFillStyle(0);
+        l->SetBorderSize(0);
+        l->SetTextSize(0.04);
+        l->SetTextFont(42);
+
+        h_name = match + std::string("tp_eta_") + ss + "_0_0" + trunc;
+        TH1F* h_f0 = new TH1F(h_name.c_str(), ";Tracking particle #eta; Tracking particles / 0.1", 50, -2.5, 2.5);
+        copyHistEntries(h_f0, h[h_name], 50);
+
+        h_name = match + std::string("tp_eta_") + ss + "_0_6" + trunc;
+        TH1F* h_f6 = new TH1F(h_name.c_str(), ";Tracking particle #eta; Tracking particles / 0.1", 50, -2.5, 2.5);
+        copyHistEntries(h_f6, h[h_name], 50);
+        h_f6->SetLineColor(4);
+        h_f6->SetMarkerColor(4);
+
+        h_f0->Draw("p");
+        h_f6->Draw("p,same");
+
+        l->AddEntry(h_f0, SCENARIO_P[0].c_str(), "pl");
+        l->AddEntry(h_f6, SCENARIO_P[6].c_str(), "pl");
+        
+        l->Draw();
+
+        std::string f_name = "plots/" + SAMPLE[is] + "/" + QUADRANT[0] + "/" + match + "tp_eta_f06" + trunc + ".pdf";
+        gPad->SetGridy();
+        c.SaveAs(f_name.c_str());
+        gPad->SetGridy(0);
+
+        delete l;
+      }
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------
 
 
-void readHistograms(int s, int q, vector<int> scenarios, int n) {
+void copyHistEntries(TH1F* h_ret, TH1F* h_copy, int n_bins) {
+
+  for(int i = 1; i <= n_bins; i++) {
+    h_ret->SetBinContent(i, h_copy->GetBinContent(i));
+    h_ret->SetBinError(i, h_copy->GetBinError(i));
+  }
+}
+
+
+void readHistograms(int s, int q, vector<int> scenarios, int n, bool truncation) {
 
   std::string h_name, f_name;
   std::string suffix = "_" + std::to_string(s) + "_" + std::to_string(q) + "_";
 
   for(auto &is : scenarios) {
 
-    f_name = "results/" + SAMPLE[s] + "/" + QUADRANT[q] + "/f" + std::to_string(is)
-      + "_e" + std::to_string(n) + "/output_" + SAMPLE[s] + ".root";
+    f_name = "results";
+    f_name += "/" + SAMPLE[s];
+    f_name += "/" + QUADRANT[q];
+    f_name += "/f" + std::to_string(is) + "_e" + std::to_string(n);
+    if(!truncation) f_name += "_noTrunc";
+    f_name += "/output_" + SAMPLE[s] + ".root";
+
     TFile* f = TFile::Open(f_name.c_str());
 
     h_name = "eff_eta" + suffix + std::to_string(is);
+    if(!truncation) h_name += "_noTrunc";
     h[h_name] = f->Get<TH1F>("eff_eta");
     h[h_name]->SetMinimum(0.0);
     h[h_name]->SetMaximum(1.1);
@@ -165,6 +420,7 @@ void readHistograms(int s, int q, vector<int> scenarios, int n) {
     h[h_name]->SetMarkerColor(COLOR[is]);
 
     h_name = "ntrk_pt3" + suffix + std::to_string(is);
+    if(!truncation) h_name += "_noTrunc";
     h[h_name] = f->Get<TH1F>("ntrk_pt3");
     h[h_name]->Scale(1.0 / n);
     h[h_name]->GetYaxis()->SetTitle("Fraction of events");
@@ -174,6 +430,7 @@ void readHistograms(int s, int q, vector<int> scenarios, int n) {
     h[h_name]->SetMarkerColor(COLOR[is]);
 
     h_name = "resVsEta_z0_68" + suffix + std::to_string(is);
+    if(!truncation) h_name += "_noTrunc";
     h[h_name] = f->Get<TH1F>("resVsEta_z0_68");
     h[h_name]->GetXaxis()->SetRangeUser(0.0, 2.4);
     h[h_name]->SetMinimum(0.0);
@@ -184,6 +441,7 @@ void readHistograms(int s, int q, vector<int> scenarios, int n) {
     h[h_name]->SetMarkerColor(COLOR[is]);
 
     h_name = "resVsEta_z0_90" + suffix + std::to_string(is);
+    if(!truncation) h_name += "_noTrunc";
     h[h_name] = f->Get<TH1F>("resVsEta_z0_90");
     h[h_name]->GetXaxis()->SetRangeUser(0.0, 2.4);
     h[h_name]->SetMinimum(0.0);
@@ -192,6 +450,38 @@ void readHistograms(int s, int q, vector<int> scenarios, int n) {
     h[h_name]->SetMarkerStyle(s == 0 ? MARKER[2] : MARKER[4]);
     h[h_name]->SetMarkerSize(MARKER_SIZE);
     h[h_name]->SetMarkerColor(COLOR[is]);
+
+    h_name = "match_tp_eta" + suffix + std::to_string(is);
+    if(!truncation) h_name += "_noTrunc";
+    h[h_name] = f->Get<TH1F>("match_tp_eta");
+    if(h[h_name]) {
+      h[h_name]->SetMinimum(0.0);
+      h[h_name]->SetMaximum(1.1);
+      h[h_name]->SetLineColor(COLOR[is]);
+      h[h_name]->SetMarkerStyle(is == 0 ? MARKER[0] : MARKER[1]);
+      h[h_name]->SetMarkerSize(MARKER_SIZE);
+      h[h_name]->SetMarkerColor(COLOR[is]);
+    }
+    else {
+      if(debug)
+        std::cout << f_name << " does not contain match_tp_eta histogram." << std::endl;
+    }
+
+    h_name = "tp_eta" + suffix + std::to_string(is);
+    if(!truncation) h_name += "_noTrunc";
+    h[h_name] = f->Get<TH1F>("tp_eta");
+    if(h[h_name]) {
+      h[h_name]->SetMinimum(0.0);
+      h[h_name]->SetMaximum(1.1);
+      h[h_name]->SetLineColor(COLOR[is]);
+      h[h_name]->SetMarkerStyle(is == 0 ? MARKER[0] : MARKER[1]);
+      h[h_name]->SetMarkerSize(MARKER_SIZE);
+      h[h_name]->SetMarkerColor(COLOR[is]);
+    }
+    else {
+      if(debug)
+        std::cout << f_name << " does not contain tp_eta histogram." << std::endl;
+    }
   }
 }
 
@@ -238,7 +528,7 @@ void makeResidualIntervalPlot(int s, int q, vector<int> scenarios, std::string n
 }
 
 
-void makeMultiPlot(int s, int q, vector<int> scenarios, std::string name, std::string type, bool plot_log) {
+void makeMultiPlot(int s, int q, vector<int> scenarios, std::string name, std::string type, bool plot_log, bool truncation) {
 
   TCanvas c;
 
@@ -251,6 +541,7 @@ void makeMultiPlot(int s, int q, vector<int> scenarios, std::string name, std::s
   std::string suffix = "_" + std::to_string(s) + "_" + std::to_string(q) + "_";
   for(auto &is : scenarios) {
     std::string h_name = name + suffix + std::to_string(is);
+    if(!truncation) h_name += "_noTrunc";
     h[h_name]->Draw("p,same");
     l->AddEntry(h[h_name], SCENARIO_P[is].c_str(), "pl");
   }
@@ -258,6 +549,7 @@ void makeMultiPlot(int s, int q, vector<int> scenarios, std::string name, std::s
   l->Draw();
 
   std::string f_name = "plots/" + SAMPLE[s] + "/" + QUADRANT[q] + "/" + name + "_" + type;
+  if(!truncation) f_name += "_noTrunc";
   gPad->SetGridy();
   c.SaveAs((f_name + ".pdf").c_str());
   gPad->SetGridy(0);
