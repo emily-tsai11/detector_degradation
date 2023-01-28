@@ -6,6 +6,11 @@ const std::string SAMPLES[] = {
   "TTbar_noPU_D88"
 };
 
+const std::string SAMPLE_LATEX[] = {
+  "t#bar{t}, PU 200, D88",
+  "t#bar{t}, no PU, D88",
+};
+
 const std::string FAIL_SCENARIOS[] = {
   "No dead modules",   // 0
   "Kill L5 + 5% loss", // 1

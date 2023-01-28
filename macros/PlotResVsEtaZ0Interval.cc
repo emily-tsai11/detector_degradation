@@ -1,11 +1,14 @@
 #include "../include/Constants.hh"
+#include "../include/SmallText.hh"
+#include "../include/Config.hh"
 #include "../include/Style.hh"
+
 
 void PlotResVsEtaZ0Interval() {
 
   SetPlotStyle();
 
-  std::string sample = SAMPLES[0];
+  std::string sample = SAMPLES[SAMPLE];
 
   std::string f0_name = "../results/" + sample + "_f0e9000/output_" + sample + ".root";
   TFile* f0 = TFile::Open(f0_name.c_str());
@@ -54,7 +57,7 @@ void PlotResVsEtaZ0Interval() {
     h_68->Draw("p,same");
     h_90->Draw("p,same");
 
-    TLegend* l1 = new TLegend(0.55, 0.55, 0.8, 0.85);
+    TLegend* l1 = new TLegend(0.2, 0.65, 0.5, 0.85);
     l1->SetFillStyle(0);
     l1->SetBorderSize(0);
     l1->SetTextSize(0.04);
@@ -65,7 +68,7 @@ void PlotResVsEtaZ0Interval() {
 
     l1->Draw();
 
-    TLegend* l2 = new TLegend(0.3, 0.55, 0.4, 0.85);
+    TLegend* l2 = new TLegend(0.5, 0.65, 0.75, 0.85);
     l2->SetFillStyle(0);
     l2->SetBorderSize(0);
     l2->SetTextSize(0.04);
@@ -80,12 +83,12 @@ void PlotResVsEtaZ0Interval() {
     c.SetLeftMargin(0.15);
     c.SetBottomMargin(0.15);
 
+    MySmallText(0.2, 0.55, 1, SAMPLE_LATEX[SAMPLE]);
+
     f_name = "../plots/" + sample + "_resVsEta_z0_interval_f" + std::to_string(s) + ".pdf";
     c.SaveAs(f_name.c_str());
 
     delete l1;
     delete l2;
-
   }
-
 }
