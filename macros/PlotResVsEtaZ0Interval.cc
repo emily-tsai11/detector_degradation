@@ -27,7 +27,7 @@ void PlotResVsEtaZ0Interval() {
   h0_90->SetMarkerSize(MARKER_SIZE);
   h0_90->SetMarkerStyle(24);
 
-  for(auto& s : {1, 2, 3, 4, 5, 6, 7, 8}) {
+  for(int s = 1; s <= N_FAIL_SCENARIOS; s++) {
 
     std::string f_name = "../results/" + sample + "_f" + std::to_string(s) + "e9000/output_" + sample + ".root";
     TFile* f = TFile::Open(f_name.c_str());

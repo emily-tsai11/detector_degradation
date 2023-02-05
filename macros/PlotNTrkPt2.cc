@@ -4,7 +4,7 @@
 #include "../include/Style.hh"
 
 
-void PlotNTrkPt3() {
+void PlotNTrkPt2() {
 
   SetPlotStyle();
 
@@ -13,7 +13,7 @@ void PlotNTrkPt3() {
   std::string f0_name = "../results/" + sample + "_f0e9000/output_" + sample + ".root";
   TFile* f0 = TFile::Open(f0_name.c_str());
 
-  TH1F* h0 = f0->Get<TH1F>("ntrk_pt3");
+  TH1F* h0 = f0->Get<TH1F>("ntrk_pt2");
   h0->GetXaxis()->SetRangeUser(0.0, 300.0);
   h0->Scale(1.0 / 9000.0);
   h0->GetYaxis()->SetTitle("Fraction of events");
@@ -25,7 +25,7 @@ void PlotNTrkPt3() {
     std::string f_name = "../results/" + sample + "_f" + std::to_string(s) + "e9000/output_" + sample + ".root";
     TFile* f = TFile::Open(f_name.c_str());
 
-    TH1F* h = f->Get<TH1F>("ntrk_pt3");
+    TH1F* h = f->Get<TH1F>("ntrk_pt2");
     h->Scale(1.0 / 9000.0);
     h->GetYaxis()->SetTitle("Fraction of events");
     h->SetMarkerSize(MARKER_SIZE);
@@ -38,7 +38,11 @@ void PlotNTrkPt3() {
     h0->Draw("p");
     h->Draw("p,same");
 
-    TLegend* l = new TLegend(0.62, 0.68, 0.9, 0.9);
+    TLegend* l = new TLegend(
+      SAMPLE == 1 ? 0.62 : 0.18,
+      0.68,
+      SAMPLE == 1 ? 0.9 : 0.38,
+      0.9);
     l->SetFillStyle(0);
     l->SetBorderSize(0);
     l->SetTextSize(0.04);
@@ -53,9 +57,11 @@ void PlotNTrkPt3() {
     c.SetLeftMargin(0.15);
     c.SetBottomMargin(0.15);
 
-    MySmallText(0.7, 0.55, 1, SAMPLE_LATEX[SAMPLE]);
+    MySmallText(
+      SAMPLE == 1 ? 0.7 : 0.18,
+      0.55, 1, SAMPLE_LATEX[SAMPLE]);
 
-    f_name = "../plots/" + sample + "_ntrk_pt3_f" + std::to_string(s);
+    f_name = "../plots/" + sample + "_ntrk_pt2_f" + std::to_string(s);
 
     gPad->SetLogy();
     c.SaveAs((f_name + "_log.pdf").c_str());
@@ -88,7 +94,11 @@ void PlotNTrkPt3() {
 
     TCanvas c;
 
-    TLegend* l = new TLegend(0.62, 0.68, 0.9, 0.9);
+    TLegend* l = new TLegend(
+      SAMPLE == 1 ? 0.62 : 0.18,
+      0.68,
+      SAMPLE == 1 ? 0.9 : 0.38,
+      0.9);
     l->SetFillStyle(0);
     l->SetBorderSize(0);
     l->SetTextSize(0.04);
@@ -103,7 +113,7 @@ void PlotNTrkPt3() {
       std::string f_name = "../results/" + sample + "_f" + std::to_string(s) + "e9000/output_" + sample + ".root";
       TFile* f = TFile::Open(f_name.c_str());
 
-      TH1F* h = f->Get<TH1F>("ntrk_pt3");
+      TH1F* h = f->Get<TH1F>("ntrk_pt2");
       h->Scale(1.0 / 9000.0);
       h->GetYaxis()->SetTitle("Fraction of events");
       h->SetMarkerSize(MARKER_SIZE);
@@ -122,9 +132,11 @@ void PlotNTrkPt3() {
     c.SetLeftMargin(0.15);
     c.SetBottomMargin(0.15);
 
-    MySmallText(0.7, 0.55, 1, SAMPLE_LATEX[SAMPLE]);
+    MySmallText(
+      SAMPLE == 1 ? 0.7 : 0.18,
+      0.55, 1, SAMPLE_LATEX[SAMPLE]);
 
-    std::string f_name = "../plots/" + sample + "_ntrk_pt3_" + CASES[i].first;
+    std::string f_name = "../plots/" + sample + "_ntrk_pt2_" + CASES[i].first;
 
     gPad->SetLogy();
     c.SaveAs((f_name + "_log.pdf").c_str());
