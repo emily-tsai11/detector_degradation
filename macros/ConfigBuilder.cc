@@ -15,13 +15,15 @@ void DefineStubKillerConstants() {
   if(SAMPLE == 0) {
     N_SAMPLE = "TTbar_PU200_D88";
     LATEX_SAMPLE = "t#bar{t}, PU 200, D88";
+
     LX1 = 0.18;
     LX2 = 0.38;
-    TX = 0.18;
+    TX = 0.17;
   }
   else if(SAMPLE == 1) {
     N_SAMPLE = "TTbar_noPU_D88";
     LATEX_SAMPLE = "t#bar{t}, no PU, D88";
+
     LX1 = 0.62;
     LX2 = 0.9;
     TX = 0.7;
@@ -75,9 +77,9 @@ void DefineBiasRailConstants() {
 
   LATEX_SAMPLE = "t#bar{t}, PU 200, D88";
 
-  LX1 = 0.62;
-  LX2 = 0.9;
-  TX = 0.7;
+  LX1 = 0.18;
+  LX2 = 0.38;
+  TX = 0.17;
 
   N_SAVE = "v";
 

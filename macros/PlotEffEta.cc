@@ -19,49 +19,52 @@ void PlotEffEta() {
   h_ref->SetMarkerSize(MARKER_SIZE);
   h_ref->SetMarkerStyle(20);
 
-  for(int s = 0; s < F_FAILS.size(); s++) {
+  if(DO_DETAILED_PLOTS) {
 
-    if(F_FAILS[s].length() == 0) continue;
+    for(int s = 0; s < F_FAILS.size(); s++) {
 
-    TFile* f = TFile::Open(F_FAILS[s].c_str());
+      if(F_FAILS[s].length() == 0) continue;
 
-    TH1F* h = f->Get<TH1F>("eff_eta");
-    h->SetMinimum(0.0);
-    h->SetMaximum(1.1);
-    h->SetMarkerSize(MARKER_SIZE);
-    h->SetMarkerStyle(21);
-    h->SetMarkerColor(COLOR[s]);
-    h->SetLineColor(COLOR[s]);
+      TFile* f = TFile::Open(F_FAILS[s].c_str());
 
-    TCanvas c;
+      TH1F* h = f->Get<TH1F>("eff_eta");
+      h->SetMinimum(0.0);
+      h->SetMaximum(1.1);
+      h->SetMarkerSize(MARKER_SIZE);
+      h->SetMarkerStyle(21);
+      h->SetMarkerColor(COLOR[s]);
+      h->SetLineColor(COLOR[s]);
 
-    h_ref->Draw("p");
-    h->Draw("p,same");
+      TCanvas c;
 
-    TLegend* l = new TLegend(0.6, 0.4, 0.85, 0.55);
-    l->SetFillStyle(0);
-    l->SetBorderSize(0);
-    l->SetTextSize(0.04);
-    l->SetTextFont(42);
+      h_ref->Draw("p");
+      h->Draw("p,same");
 
-    l->AddEntry(h_ref, LATEX_FAILS[0].c_str(), "pl");
-    l->AddEntry(h, LATEX_FAILS[s].c_str(), "pl");
+      TLegend* l = new TLegend(0.6, 0.4, 0.85, 0.55);
+      l->SetFillStyle(0);
+      l->SetBorderSize(0);
+      l->SetTextSize(0.04);
+      l->SetTextFont(42);
 
-    l->Draw();
+      l->AddEntry(h_ref, LATEX_FAILS[0].c_str(), "pl");
+      l->AddEntry(h, LATEX_FAILS[s].c_str(), "pl");
 
-    c.SetRightMargin(0.09);
-    c.SetLeftMargin(0.15);
-    c.SetBottomMargin(0.15);
+      l->Draw();
 
-    MySmallText(0.2, 0.5, 1, LATEX_SAMPLE);
+      c.SetRightMargin(0.09);
+      c.SetLeftMargin(0.15);
+      c.SetBottomMargin(0.15);
 
-    f_name = "../plots/" + N_SAMPLE + "_eff_eta_" + N_SAVE + std::to_string(s) + ".pdf";
+      MySmallText(0.2, 0.5, 1, LATEX_SAMPLE);
 
-    gPad->SetGridy();
-    c.SaveAs(f_name.c_str());
-    gPad->SetGridy(0);
+      f_name = "../plots/" + N_SAMPLE + "_eff_eta_" + N_SAVE + std::to_string(s) + ".pdf";
 
-    delete l;
+      gPad->SetGridy();
+      c.SaveAs(f_name.c_str());
+      gPad->SetGridy(0);
+
+      delete l;
+    }
   }
 
   for(int i = 0; i < CASES.size(); i++) {

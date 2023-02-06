@@ -14,75 +14,78 @@ void PlotNTrkPt2() {
   TFile* f_ref = TFile::Open(F_REF.c_str());
 
   TH1F* h_ref = f_ref->Get<TH1F>("ntrk_pt2");
-  // h_ref->GetXaxis()->SetRangeUser(0.0, 300.0);
+  h_ref->GetXaxis()->SetRangeUser(0.0, 320.0);
   h_ref->Scale(1.0 / 9000.0);
   h_ref->GetYaxis()->SetTitle("Fraction of events");
   h_ref->SetMarkerSize(MARKER_SIZE);
   h_ref->SetMarkerStyle(20);
 
-  for(int s = 0; s < F_FAILS.size(); s++) {
+  if(DO_DETAILED_PLOTS) {
 
-    if(F_FAILS[s].length() == 0) continue;
+    for(int s = 0; s < F_FAILS.size(); s++) {
 
-    TFile* f = TFile::Open(F_FAILS[s].c_str());
+      if(F_FAILS[s].length() == 0) continue;
 
-    TH1F* h = f->Get<TH1F>("ntrk_pt2");
-    h->Scale(1.0 / 9000.0);
-    h->GetYaxis()->SetTitle("Fraction of events");
-    h->SetMarkerSize(MARKER_SIZE);
-    h->SetMarkerStyle(21);
-    h->SetMarkerColor(COLOR[s]);
-    h->SetLineColor(COLOR[s]);
+      TFile* f = TFile::Open(F_FAILS[s].c_str());
 
-    TCanvas c;
+      TH1F* h = f->Get<TH1F>("ntrk_pt2");
+      h->Scale(1.0 / 9000.0);
+      h->GetYaxis()->SetTitle("Fraction of events");
+      h->SetMarkerSize(MARKER_SIZE);
+      h->SetMarkerStyle(21);
+      h->SetMarkerColor(COLOR[s]);
+      h->SetLineColor(COLOR[s]);
 
-    h_ref->Draw("p");
-    h->Draw("p,same");
+      TCanvas c;
 
-    TLegend* l = new TLegend(LX1, 0.68, LX2, 0.9);
-    l->SetFillStyle(0);
-    l->SetBorderSize(0);
-    l->SetTextSize(0.04);
-    l->SetTextFont(42);
+      h_ref->Draw("p");
+      h->Draw("p,same");
 
-    l->AddEntry(h_ref, LATEX_FAILS[0].c_str(), "pl");
-    l->AddEntry(h, LATEX_FAILS[s].c_str(), "pl");
+      TLegend* l = new TLegend(LX1, 0.68, LX2, 0.9);
+      l->SetFillStyle(0);
+      l->SetBorderSize(0);
+      l->SetTextSize(0.04);
+      l->SetTextFont(42);
 
-    l->Draw();
+      l->AddEntry(h_ref, LATEX_FAILS[0].c_str(), "pl");
+      l->AddEntry(h, LATEX_FAILS[s].c_str(), "pl");
 
-    c.SetRightMargin(0.09);
-    c.SetLeftMargin(0.15);
-    c.SetBottomMargin(0.15);
+      l->Draw();
 
-    MySmallText(TX, 0.55, 1, LATEX_SAMPLE);
+      c.SetRightMargin(0.09);
+      c.SetLeftMargin(0.15);
+      c.SetBottomMargin(0.15);
 
-    f_name = "../plots/" + N_SAMPLE + "_ntrk_pt2_" + N_SAVE + std::to_string(s);
+      MySmallText(TX, 0.55, 1, LATEX_SAMPLE);
 
-    gPad->SetLogy();
-    c.SaveAs((f_name + "_log.pdf").c_str());
-    gPad->SetLogy(0);
-
-    if(DO_DETAILED_PLOTS)
-    {
-      gPad->SetGridy();
-      c.SaveAs((f_name + ".pdf").c_str());
-      gPad->SetGridy(0);
-
-      // zoomed plots
-      h_ref->GetXaxis()->SetRangeUser(0.0, 150.0);
-
-      gPad->SetGridy();
-      c.SaveAs((f_name + "_z.pdf").c_str());
-      gPad->SetGridy(0);
+      f_name = "../plots/" + N_SAMPLE + "_ntrk_pt2_" + N_SAVE + std::to_string(s);
 
       gPad->SetLogy();
-      c.SaveAs((f_name + "_z_log.pdf").c_str());
+      c.SaveAs((f_name + "_log.pdf").c_str());
       gPad->SetLogy(0);
 
-      h_ref->GetXaxis()->SetRangeUser(0.0, 300.0);
-    }
+      if(DO_EXTRA_DETAILED_PLOTS)
+      {
+        gPad->SetGridy();
+        c.SaveAs((f_name + ".pdf").c_str());
+        gPad->SetGridy(0);
 
-    delete l;
+        // zoomed plots
+        h_ref->GetXaxis()->SetRangeUser(0.0, 150.0);
+
+        gPad->SetGridy();
+        c.SaveAs((f_name + "_z.pdf").c_str());
+        gPad->SetGridy(0);
+
+        gPad->SetLogy();
+        c.SaveAs((f_name + "_z_log.pdf").c_str());
+        gPad->SetLogy(0);
+
+        h_ref->GetXaxis()->SetRangeUser(0.0, 320.0);
+      }
+
+      delete l;
+    }
   }
 
   for(int i = 0; i < CASES.size(); i++) {
@@ -130,7 +133,7 @@ void PlotNTrkPt2() {
     c.SaveAs((f_name + "_log.pdf").c_str());
     gPad->SetLogy(0);
 
-    if(DO_DETAILED_PLOTS)
+    if(DO_EXTRA_DETAILED_PLOTS)
     {
       gPad->SetGridy();
       c.SaveAs((f_name + ".pdf").c_str());
@@ -147,7 +150,7 @@ void PlotNTrkPt2() {
       c.SaveAs((f_name + "_z_log.pdf").c_str());
       gPad->SetLogy(0);
 
-      h_ref->GetXaxis()->SetRangeUser(0.0, 300.0);
+      h_ref->GetXaxis()->SetRangeUser(0.0, 320.0);
     }
 
     delete l;
