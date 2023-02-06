@@ -9,7 +9,6 @@ void MySmallText(Double_t x, Double_t y, Color_t color, std::string text) {
   l.SetNDC();
   l.SetTextColor(color);
   l.DrawLatex(x, y, text.c_str());
-
 }
 
 #endif
