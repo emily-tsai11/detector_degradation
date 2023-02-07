@@ -3,7 +3,7 @@
 #include "../include/Style.hh"
 
 
-void PlotEffEta() {
+void PlotEffPt() {
 
   if(!configHasRun) gROOT->ProcessLine(".x ConfigBuilder.cc");
 
@@ -13,7 +13,7 @@ void PlotEffEta() {
 
   TFile* f_ref = TFile::Open(F_REF.c_str());
 
-  TH1F* h_ref = f_ref->Get<TH1F>("eff_eta");
+  TH1F* h_ref = f_ref->Get<TH1F>("eff_pt");
   h_ref->SetMinimum(0.0);
   h_ref->SetMaximum(1.1);
   h_ref->SetMarkerSize(MARKER_SIZE);
@@ -46,7 +46,7 @@ void PlotEffEta() {
 
       TFile* f = TFile::Open(F_FAILS[s].c_str());
 
-      TH1F* h = f->Get<TH1F>("eff_eta");
+      TH1F* h = f->Get<TH1F>("eff_pt");
       h->SetMinimum(0.0);
       h->SetMaximum(1.1);
       h->SetMarkerSize(MARKER_SIZE);
@@ -83,7 +83,7 @@ void PlotEffEta() {
     c->cd();
 
     gPad->SetGridy();
-    f_name = "../plots/" + N_SAMPLE + "_eff_eta_" + CASES[i].first + ".pdf";
+    f_name = "../plots/" + N_SAMPLE + "_eff_pt_" + CASES[i].first + ".pdf";
     c->SaveAs(f_name.c_str());
     gPad->SetGridy(0);
 
@@ -99,7 +99,7 @@ void PlotEffEta() {
 
       TFile* f = TFile::Open(F_FAILS[s].c_str());
 
-      TH1F* h = f->Get<TH1F>("eff_eta");
+      TH1F* h = f->Get<TH1F>("eff_pt");
       h->SetMinimum(0.0);
       h->SetMaximum(1.1);
       h->SetMarkerSize(MARKER_SIZE);
@@ -154,7 +154,7 @@ void PlotEffEta() {
       c->cd();
 
       gPad->SetGridy();
-      f_name = "../plots/" + N_SAMPLE + "_eff_eta_" + N_SAVE + std::to_string(s) + ".pdf";
+      f_name = "../plots/" + N_SAMPLE + "_eff_pt_" + N_SAVE + std::to_string(s) + ".pdf";
       c->SaveAs(f_name.c_str());
       gPad->SetGridy(0);
 

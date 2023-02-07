@@ -3,7 +3,7 @@
 #include "../include/Style.hh"
 
 
-void PlotEffEta() {
+void PlotEffd0() {
 
   if(!configHasRun) gROOT->ProcessLine(".x ConfigBuilder.cc");
 
@@ -13,7 +13,7 @@ void PlotEffEta() {
 
   TFile* f_ref = TFile::Open(F_REF.c_str());
 
-  TH1F* h_ref = f_ref->Get<TH1F>("eff_eta");
+  TH1F* h_ref = f_ref->Get<TH1F>("eff_d0");
   h_ref->SetMinimum(0.0);
   h_ref->SetMaximum(1.1);
   h_ref->SetMarkerSize(MARKER_SIZE);
@@ -26,10 +26,10 @@ void PlotEffEta() {
     p_eff->SetBottomMargin(0.0);
     p_eff->Draw();
 
-    TLegend* l = new TLegend(0.6, 0.25, 0.85, 0.55);
+    TLegend* l = new TLegend(0.7, 0.24, 0.9, 0.54);
     l->SetFillStyle(0);
     l->SetBorderSize(0);
-    l->SetTextSize(0.04);
+    l->SetTextSize(0.035);
     l->SetTextFont(42);
 
     TPad* p_ratio = new TPad("p_ratio", "p_ratio", 0.0, 0.0, 1.0, 0.3);
@@ -46,7 +46,7 @@ void PlotEffEta() {
 
       TFile* f = TFile::Open(F_FAILS[s].c_str());
 
-      TH1F* h = f->Get<TH1F>("eff_eta");
+      TH1F* h = f->Get<TH1F>("eff_d0");
       h->SetMinimum(0.0);
       h->SetMaximum(1.1);
       h->SetMarkerSize(MARKER_SIZE);
@@ -83,7 +83,7 @@ void PlotEffEta() {
     c->cd();
 
     gPad->SetGridy();
-    f_name = "../plots/" + N_SAMPLE + "_eff_eta_" + CASES[i].first + ".pdf";
+    f_name = "../plots/" + N_SAMPLE + "_eff_d0_" + CASES[i].first + ".pdf";
     c->SaveAs(f_name.c_str());
     gPad->SetGridy(0);
 
@@ -99,7 +99,7 @@ void PlotEffEta() {
 
       TFile* f = TFile::Open(F_FAILS[s].c_str());
 
-      TH1F* h = f->Get<TH1F>("eff_eta");
+      TH1F* h = f->Get<TH1F>("eff_d0");
       h->SetMinimum(0.0);
       h->SetMaximum(1.1);
       h->SetMarkerSize(MARKER_SIZE);
@@ -126,10 +126,10 @@ void PlotEffEta() {
       p_eff->SetBottomMargin(0.0);
       p_eff->Draw();
 
-      TLegend* l = new TLegend(0.6, 0.4, 0.85, 0.55);
+      TLegend* l = new TLegend(0.7, 0.24, 0.9, 0.54);
       l->SetFillStyle(0);
       l->SetBorderSize(0);
-      l->SetTextSize(0.04);
+      l->SetTextSize(0.035);
       l->SetTextFont(42);
 
       TPad* p_ratio = new TPad("p_ratio", "p_ratio", 0.0, 0.0, 1.0, 0.3);
@@ -154,7 +154,7 @@ void PlotEffEta() {
       c->cd();
 
       gPad->SetGridy();
-      f_name = "../plots/" + N_SAMPLE + "_eff_eta_" + N_SAVE + std::to_string(s) + ".pdf";
+      f_name = "../plots/" + N_SAMPLE + "_eff_d0_" + N_SAVE + std::to_string(s) + ".pdf";
       c->SaveAs(f_name.c_str());
       gPad->SetGridy(0);
 

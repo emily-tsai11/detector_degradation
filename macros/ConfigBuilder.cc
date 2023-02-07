@@ -47,16 +47,16 @@ void DefineStubKillerConstants() {
   };
 
   LATEX_FAILS = {
-    "No dead modules",   // 0
-    "Kill L5 + 5% loss", // 1
-    "Kill L1 + 5% loss", // 2
-    "Kill L1 + L2",      // 3
-    "Kill L1 + D1",      // 4
-    "5% loss",           // 5
-    "1% loss",           // 6
-    "Kill L5 + 1% loss", // 7
-    "Kill L1 + 1% loss", // 8
-    "10% loss"           // 9
+    "No dead modules",          // 0
+    "Kill L5 + 5% module loss", // 1
+    "Kill L1 + 5% module loss", // 2
+    "Kill L1 + L2",             // 3
+    "Kill L1 + D1",             // 4
+    "5% module loss",           // 5
+    "1% module loss",           // 6
+    "Kill L5 + 1% module loss", // 7
+    "Kill L1 + 1% module loss", // 8
+    "10% module loss"           // 9
   };
 
   CASES = {
@@ -95,17 +95,17 @@ void DefineBiasRailConstants() {
   };
 
   LATEX_FAILS = {
-    "No inefficiency", // 0
+    "No inefficiency",            // 0
     "",
-    "biasRail1pc",     // 2
-    "biasRail5pc",     // 3
-    "biasRail10pc",    // 4
-    "biasRail"         // 5
+    "Bias rail + 1% bad strips",  // 2
+    "Bias rail + 5% bad strips",  // 3
+    "Bias rail + 10% bad strips", // 4
+    "Bias rail"                   // 5
   };
 
   CASES = {
     {"ploss", {5, 2, 3, 4}}
   };
 
-  COLOR = {-1, 1, 94, 15, 226, 9};
+  COLOR = {-1, 1, 94, 15, 226, 9}; // COLOR[0] not used
 }

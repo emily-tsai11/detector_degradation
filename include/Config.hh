@@ -7,7 +7,7 @@
 // 2 -- TRK2026D88PU200MB2
 const int SAMPLE = 2;
 
-const bool DO_DETAILED_PLOTS = false;
+const bool DO_DETAILED_PLOTS = true;
 const bool DO_EXTRA_DETAILED_PLOTS = false;
 
 

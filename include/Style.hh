@@ -1,6 +1,7 @@
 #ifndef STYLE
 #define STYLE
 
+
 // from ATLAS plot style macro
 void SetPlotStyle() {
 
@@ -61,5 +62,6 @@ void SetPlotStyle() {
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
 }
+
 
 #endif

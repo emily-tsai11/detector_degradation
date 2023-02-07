@@ -3,7 +3,7 @@
 #include "../include/Style.hh"
 
 
-void PlotEffEta() {
+void PlotEffz0() {
 
   if(!configHasRun) gROOT->ProcessLine(".x ConfigBuilder.cc");
 
@@ -13,7 +13,7 @@ void PlotEffEta() {
 
   TFile* f_ref = TFile::Open(F_REF.c_str());
 
-  TH1F* h_ref = f_ref->Get<TH1F>("eff_eta");
+  TH1F* h_ref = f_ref->Get<TH1F>("eff_z0");
   h_ref->SetMinimum(0.0);
   h_ref->SetMaximum(1.1);
   h_ref->SetMarkerSize(MARKER_SIZE);
@@ -26,7 +26,7 @@ void PlotEffEta() {
     p_eff->SetBottomMargin(0.0);
     p_eff->Draw();
 
-    TLegend* l = new TLegend(0.6, 0.25, 0.85, 0.55);
+    TLegend* l = new TLegend(0.4, 0.15, 0.6, 0.45);
     l->SetFillStyle(0);
     l->SetBorderSize(0);
     l->SetTextSize(0.04);
@@ -46,7 +46,7 @@ void PlotEffEta() {
 
       TFile* f = TFile::Open(F_FAILS[s].c_str());
 
-      TH1F* h = f->Get<TH1F>("eff_eta");
+      TH1F* h = f->Get<TH1F>("eff_z0");
       h->SetMinimum(0.0);
       h->SetMaximum(1.1);
       h->SetMarkerSize(MARKER_SIZE);
@@ -79,11 +79,11 @@ void PlotEffEta() {
 
     p_eff->cd();
     l->Draw();
-    MySmallText(0.2, 0.5, 1, LATEX_SAMPLE);
+    MySmallText(0.45, 0.6, 1, LATEX_SAMPLE);
     c->cd();
 
     gPad->SetGridy();
-    f_name = "../plots/" + N_SAMPLE + "_eff_eta_" + CASES[i].first + ".pdf";
+    f_name = "../plots/" + N_SAMPLE + "_eff_z0_" + CASES[i].first + ".pdf";
     c->SaveAs(f_name.c_str());
     gPad->SetGridy(0);
 
@@ -91,7 +91,7 @@ void PlotEffEta() {
     delete c;
   }
 
-  if(DO_DETAILED_PLOTS) {
+  if(DO_EXTRA_DETAILED_PLOTS) {
 
     for(int s = 0; s < F_FAILS.size(); s++) {
 
@@ -99,7 +99,7 @@ void PlotEffEta() {
 
       TFile* f = TFile::Open(F_FAILS[s].c_str());
 
-      TH1F* h = f->Get<TH1F>("eff_eta");
+      TH1F* h = f->Get<TH1F>("eff_z0");
       h->SetMinimum(0.0);
       h->SetMaximum(1.1);
       h->SetMarkerSize(MARKER_SIZE);
@@ -126,7 +126,7 @@ void PlotEffEta() {
       p_eff->SetBottomMargin(0.0);
       p_eff->Draw();
 
-      TLegend* l = new TLegend(0.6, 0.4, 0.85, 0.55);
+      TLegend* l = new TLegend(0.4, 0.15, 0.6, 0.45);
       l->SetFillStyle(0);
       l->SetBorderSize(0);
       l->SetTextSize(0.04);
@@ -150,11 +150,11 @@ void PlotEffEta() {
 
       p_eff->cd();
       l->Draw();
-      MySmallText(0.2, 0.5, 1, LATEX_SAMPLE);
+      MySmallText(0.45, 0.6, 1, LATEX_SAMPLE);
       c->cd();
 
       gPad->SetGridy();
-      f_name = "../plots/" + N_SAMPLE + "_eff_eta_" + N_SAVE + std::to_string(s) + ".pdf";
+      f_name = "../plots/" + N_SAMPLE + "_eff_z0_" + N_SAVE + std::to_string(s) + ".pdf";
       c->SaveAs(f_name.c_str());
       gPad->SetGridy(0);
 
