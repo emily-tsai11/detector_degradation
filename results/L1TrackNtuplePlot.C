@@ -36,8 +36,7 @@ void SetPlotStyle();
 void mySmallText(Double_t x, Double_t y, Color_t color, char* text);
 
 double getIntervalContainingFractionOfEntries(TH1* histogram, double interval, int minEntries = 5);
-void makeResidualIntervalPlot(
-    TString type, TString dir, TString variable, TH1F* h_68, TH1F* h_90, TH1F* h_99, double minY, double maxY);
+void makeResidualIntervalPlot(TString type, TString dir, TString variable, TH1F* h_68, TH1F* h_90, TH1F* h_99, double minY, double maxY);
 
 // ----------------------------------------------------------------------------------------------------------------
 // Main script
@@ -164,6 +163,7 @@ void L1TrackNtuplePlot(TString type,
   vector<float>* matchtrk_chi2;
   vector<float>* matchtrk_chi2rphi;
   vector<float>* matchtrk_chi2rz;
+  vector<float>* matchtrk_bendchi2;
   vector<int>* matchtrk_nstub;
   vector<int>* matchtrk_lhits;
   vector<int>* matchtrk_dhits;
@@ -180,6 +180,7 @@ void L1TrackNtuplePlot(TString type,
   vector<float>* trk_chi2;
   vector<float>* trk_chi2rphi;
   vector<float>* trk_chi2rz;
+  vector<float>* trk_bendchi2;
   vector<int>* trk_nstub;
   vector<int>* trk_lhits;
   vector<int>* trk_dhits;
@@ -215,6 +216,7 @@ void L1TrackNtuplePlot(TString type,
   TBranch* b_matchtrk_chi2;
   TBranch* b_matchtrk_chi2rphi;
   TBranch* b_matchtrk_chi2rz;
+  TBranch* b_matchtrk_bendchi2;
   TBranch* b_matchtrk_nstub;
   TBranch* b_matchtrk_lhits;
   TBranch* b_matchtrk_dhits;
@@ -230,6 +232,7 @@ void L1TrackNtuplePlot(TString type,
   TBranch* b_trk_chi2;
   TBranch* b_trk_chi2rphi;
   TBranch* b_trk_chi2rz;
+  TBranch* b_trk_bendchi2;
   TBranch* b_trk_nstub;
   TBranch* b_trk_lhits;
   TBranch* b_trk_dhits;
@@ -265,6 +268,7 @@ void L1TrackNtuplePlot(TString type,
   matchtrk_chi2 = 0;
   matchtrk_chi2rphi = 0;
   matchtrk_chi2rz = 0;
+  matchtrk_bendchi2 = 0;
   matchtrk_nstub = 0;
   matchtrk_lhits = 0;
   matchtrk_dhits = 0;
@@ -280,6 +284,7 @@ void L1TrackNtuplePlot(TString type,
   trk_chi2 = 0;
   trk_chi2rphi = 0;
   trk_chi2rz = 0;
+  trk_bendchi2 = 0;
   trk_nstub = 0;
   trk_lhits = 0;
   trk_dhits = 0;
@@ -338,6 +343,7 @@ void L1TrackNtuplePlot(TString type,
     tree->SetBranchAddress("matchtrk_chi2", &matchtrk_chi2, &b_matchtrk_chi2);
     tree->SetBranchAddress("matchtrk_chi2rphi", &matchtrk_chi2rphi, &b_matchtrk_chi2rphi);
     tree->SetBranchAddress("matchtrk_chi2rz", &matchtrk_chi2rz, &b_matchtrk_chi2rz);
+    tree->SetBranchAddress("matchtrk_bendchi2", &matchtrk_bendchi2, &b_matchtrk_bendchi2);
     tree->SetBranchAddress("matchtrk_nstub", &matchtrk_nstub, &b_matchtrk_nstub);
     tree->SetBranchAddress("matchtrk_lhits", &matchtrk_lhits, &b_matchtrk_lhits);
     tree->SetBranchAddress("matchtrk_dhits", &matchtrk_dhits, &b_matchtrk_dhits);
@@ -356,6 +362,7 @@ void L1TrackNtuplePlot(TString type,
   tree->SetBranchAddress("trk_chi2", &trk_chi2, &b_trk_chi2);
   tree->SetBranchAddress("trk_chi2rphi", &trk_chi2rphi, &b_trk_chi2rphi);
   tree->SetBranchAddress("trk_chi2rz", &trk_chi2rz, &b_trk_chi2rz);
+  tree->SetBranchAddress("trk_bendchi2", &trk_bendchi2, &b_trk_bendchi2);
   tree->SetBranchAddress("trk_nstub", &trk_nstub, &b_trk_nstub);
   tree->SetBranchAddress("trk_lhits", &trk_lhits, &b_trk_lhits);
   tree->SetBranchAddress("trk_dhits", &trk_dhits, &b_trk_dhits);
@@ -672,6 +679,9 @@ void L1TrackNtuplePlot(TString type,
   TH1F* h_match_trk_chi2rz = new TH1F("match_trk_chi2rz", ";#chi^{2}_{r-z}; L1 tracks / 1.0", 100, 0, 100);
   TH1F* h_match_trk_chi2rz_dof =
       new TH1F("match_trk_chi2rz_dof", ";#chi^{2}_{r-z} / D.O.F.; L1 tracks / 0.2", 100, 0, 20);
+
+  TH1F* h_trk_bendchi2 = new TH1F("trk_bendchi2", ";#chi^{2}_{bend}; L1 tracks / 1.0", 100, 0, 20);
+  TH1F* h_match_trk_bendchi2 = new TH1F("match_trk_bendchi2", ";#chi^{2}_{bend}; L1 tracks / 1.0", 100, 0, 20);
 
   // ----------------------------------------------------------------------------------------------------------------
   // total track rates
@@ -1026,7 +1036,7 @@ void L1TrackNtuplePlot(TString type,
     */
 
     // ----------------------------------------------------------------------------------------------------------------
-    // track loop for total rates & fake rates.
+    // track loop for total rates & fake rates
 
     int ntrkevt_pt2 = 0;
     int ntrkevt_pt3 = 0;
@@ -1046,22 +1056,24 @@ void L1TrackNtuplePlot(TString type,
       // track properties
 
       // ----------------------------------------------------------------------------------------------------------------
-      // Fill number of tracks vs track param
+      // fill number of tracks vs track param
       h_trk_pt->Fill(trk_pt->at(it));
       h_trk_eta->Fill(trk_eta->at(it));
 
       // fill all trk chi2 & chi2/dof histograms, including for chi2 r-phi and chi2 r-z
       int ndof = 2 * trk_nstub->at(it) - 4;
       float chi2 = trk_chi2->at(it);
-      float chi2dof = (float)chi2 / ndof;
+      float chi2dof = (float) chi2 / ndof;
       float chi2rphi = trk_chi2rphi->at(it);
-      float chi2rphidof = (float)chi2rphi / ndof;
+      float chi2rphidof = (float) chi2rphi / ndof;
       float chi2rz = trk_chi2rz->at(it);
-      float chi2rzdof = (float)chi2rz / ndof;
+      float chi2rzdof = (float) chi2rz / ndof;
+      float bendchi2 = trk_bendchi2->at(it);
 
       // create overflow bins by restricting range of chi2
       int chi2Overflow = 100;
-      int chi2DOFOverflow = 20;  //apprx chi2Overflow / avg. nstubs
+      int chi2DOFOverflow = 20; // approx. chi2Overflow / avg. nstubs
+      int bendchi2Overflow = 20;
       double buffer = 0.1;
 
       if (chi2 > chi2Overflow)
@@ -1076,8 +1088,10 @@ void L1TrackNtuplePlot(TString type,
         chi2rz = chi2Overflow - buffer;
       if (chi2rzdof > chi2DOFOverflow)
         chi2rzdof = chi2DOFOverflow - buffer;
+      if (bendchi2 > bendchi2Overflow)
+        bendchi2 = bendchi2Overflow - buffer;
 
-      if (trk_pt->at(it) > TP_minPt) {  //TRK pt > TP_minPt
+      if (trk_pt->at(it) > TP_minPt) { // TRK pt > TP_minPt
 
         h_trk_chi2->Fill(chi2);
         h_trk_chi2_dof->Fill(chi2dof);
@@ -1087,6 +1101,8 @@ void L1TrackNtuplePlot(TString type,
 
         h_trk_chi2rz->Fill(chi2rz);
         h_trk_chi2rz_dof->Fill(chi2rzdof);
+
+        h_trk_bendchi2->Fill(bendchi2);
 
       }  //end TRK pt > TP_minPt
 
@@ -1321,15 +1337,17 @@ void L1TrackNtuplePlot(TString type,
 
       int ndof = 2 * matchtrk_nstub->at(it) - 4;
       float chi2 = matchtrk_chi2->at(it);
-      float chi2dof = (float)chi2 / ndof;
+      float chi2dof = (float) chi2 / ndof;
       float chi2rphi = matchtrk_chi2rphi->at(it);
-      float chi2rphidof = (float)chi2rphi / ndof;
+      float chi2rphidof = (float) chi2rphi / ndof;
       float chi2rz = matchtrk_chi2rz->at(it);
-      float chi2rzdof = (float)chi2rz / ndof;
+      float chi2rzdof = (float) chi2rz / ndof;
+      float bendchi2 = (float) matchtrk_bendchi2->at(it);
 
       // create overflow bins by restricting range of chi2
       int chi2Overflow = 100;
-      int chi2DOFOverflow = 20;  //apprx chi2Overflow / avg. nstubs
+      int chi2DOFOverflow = 20; // approx. chi2Overflow / avg. nstubs
+      int bendchi2Overflow = 20;
       double buffer = 0.1;
 
       if (chi2 > chi2Overflow)
@@ -1344,6 +1362,8 @@ void L1TrackNtuplePlot(TString type,
         chi2rz = chi2Overflow - buffer;
       if (chi2rzdof > chi2DOFOverflow)
         chi2rzdof = chi2DOFOverflow - buffer;
+      if(bendchi2 > bendchi2Overflow)
+        bendchi2 = bendchi2Overflow - buffer;
 
       if (tp_pt->at(it) > TP_minPt) {  //TP pt > TP_minPt
 
@@ -1355,6 +1375,8 @@ void L1TrackNtuplePlot(TString type,
 
         h_match_trk_chi2rz->Fill(chi2rz);
         h_match_trk_chi2rz_dof->Fill(chi2rzdof);
+
+        h_match_trk_bendchi2->Fill(bendchi2);
 
         // central eta
         if (std::abs(tp_eta->at(it)) < 0.8) {
@@ -2842,12 +2864,23 @@ void L1TrackNtuplePlot(TString type,
   mySmallText(0.52, 0.82, 1, ctxt);
   c.SaveAs(DIR + type + "_trk_chi2rz_dof.pdf");
 
+  h_trk_bendchi2->Draw();
+  snprintf(ctxt, 500, "|eta| < 2.4");
+  mySmallText(0.52, 0.82, 1, ctxt);
+  c.SaveAs(DIR + type + "_trk_bendchi2.pdf");
+
   h_trk_chi2->Write();
+  h_trk_chi2_dof->Write();
   h_trk_chi2rphi->Write();
+  h_trk_chi2rphi_dof->Write();
   h_trk_chi2rz->Write();
+  h_trk_chi2rz_dof->Write();
+  h_trk_bendchi2->Write();
+
   h_match_trk_chi2->Write();
   h_match_trk_chi2rphi->Write();
   h_match_trk_chi2rz->Write();
+  h_match_trk_bendchi2->Write();
 
   if (doDetailedPlots) {
     h_match_trk_chi2_C_L->Write();
