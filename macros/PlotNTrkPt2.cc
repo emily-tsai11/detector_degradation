@@ -112,7 +112,7 @@ void plot_ntrk_pt2() {
 
     f->Close();
   }
-  
+
   if(DO_DETAILED_PLOTS) {
 
     for(int s = 0; s < F_FAILS.size(); s++) {

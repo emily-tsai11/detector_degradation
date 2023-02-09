@@ -10,7 +10,7 @@ const int SAMPLE = -1;
 
 const bool DO_DETAILED_PLOTS = 0;
 const bool DO_EXTRA_DETAILED_PLOTS = 0;
-const bool DO_QUALITY_PLOTS = 1;
+const bool DO_QUALITY_PLOTS = 0;
 
 
 #endif
