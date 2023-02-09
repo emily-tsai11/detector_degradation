@@ -1,11 +1,31 @@
+#include "../include/Config.hh"
 #include "../include/ConfigBuilder.hh"
-#include "../include/SmallText.hh"
-#include "../include/Style.hh"
+#include "../include/PlotHelperFunctions.hh"
 
 
-void PlotEffd0() {
+void plot_eff_d0();
 
-  if(!configHasRun) gROOT->ProcessLine(".x ConfigBuilder.cc");
+
+void PlotEffD0(int sample = SAMPLE) {
+
+  if(sample == 0 || sample == -1) {
+    if(!stubKiller0Set) ConfigBuilder(0);
+    plot_eff_d0();
+  }
+
+  if(sample == 1 || sample == -1) {
+    if(!stubKiller1Set) ConfigBuilder(1);
+    plot_eff_d0();
+  }
+
+  if(sample == 2 || sample == -1) {
+    if(!biasRailSet) ConfigBuilder(2);
+    plot_eff_d0();
+  }
+}
+
+
+void plot_eff_d0() {
 
   std::string f_name;
 
@@ -16,9 +36,8 @@ void PlotEffd0() {
   TH1F* h_ref = f_ref->Get<TH1F>("eff_d0");
   h_ref->SetMinimum(0.0);
   h_ref->SetMaximum(1.1);
-  h_ref->SetMarkerSize(MARKER_SIZE);
 
-  for(int i = 0; i < CASES.size(); i++) {
+  for(int i = 0; i < N_CASES.size(); i++) {
 
     TCanvas* c = new TCanvas("c", "c", 800, 600);
 
@@ -42,22 +61,24 @@ void PlotEffd0() {
     l->AddEntry(h_ref, LATEX_FAILS[0].c_str(), "pl");
     c->cd();
 
-    for(auto& s : CASES[i].second) {
+    TFile* f;
+    std::vector<int> cases;
+    GetCases(CASES[i], cases);
+    for(auto& s : cases) {
 
-      TFile* f = TFile::Open(F_FAILS[s].c_str());
+      f = TFile::Open(F_FAILS[s].c_str());
 
       TH1F* h = f->Get<TH1F>("eff_d0");
       h->SetMinimum(0.0);
       h->SetMaximum(1.1);
-      h->SetMarkerSize(MARKER_SIZE);
       h->SetMarkerColor(COLOR[s]);
       h->SetLineColor(COLOR[s]);
 
       // Sumw2 already calculated
       TH1F* h_ratio = (TH1F*) h->Clone();
       h_ratio->Divide(h_ref);
-      h_ratio->SetMinimum(EFF_RATIO_MIN);
-      h_ratio->SetMaximum(EFF_RATIO_MAX);
+      h_ratio->SetMinimum(0.5);
+      h_ratio->SetMaximum(1.2);
       h_ratio->GetXaxis()->SetTitleSize(0.12);
       h_ratio->GetXaxis()->SetTitleOffset(1.0);
       h_ratio->GetXaxis()->SetLabelSize(0.12);
@@ -83,12 +104,14 @@ void PlotEffd0() {
     c->cd();
 
     gPad->SetGridy();
-    f_name = "../plots/" + N_SAMPLE + "_eff_d0_" + CASES[i].first + ".pdf";
+    f_name = "../plots/" + N_SAMPLE + "_eff_d0_" + N_CASES[i] + ".pdf";
     c->SaveAs(f_name.c_str());
     gPad->SetGridy(0);
 
     delete l;
     delete c;
+
+    f->Close();
   }
 
   if(DO_DETAILED_PLOTS) {
@@ -102,15 +125,14 @@ void PlotEffd0() {
       TH1F* h = f->Get<TH1F>("eff_d0");
       h->SetMinimum(0.0);
       h->SetMaximum(1.1);
-      h->SetMarkerSize(MARKER_SIZE);
       h->SetMarkerColor(COLOR[s]);
       h->SetLineColor(COLOR[s]);
 
       // Sumw2 already calculated
       TH1F* h_ratio = (TH1F*) h->Clone();
       h_ratio->Divide(h_ref);
-      h_ratio->SetMinimum(EFF_RATIO_MIN);
-      h_ratio->SetMaximum(EFF_RATIO_MAX);
+      h_ratio->SetMinimum(0.5);
+      h_ratio->SetMaximum(1.2);
       h_ratio->GetXaxis()->SetTitleSize(0.12);
       h_ratio->GetXaxis()->SetTitleOffset(1.0);
       h_ratio->GetXaxis()->SetLabelSize(0.12);
@@ -160,6 +182,10 @@ void PlotEffd0() {
 
       delete l;
       delete c;
+
+      f->Close();
     }
   }
+
+  f_ref->Close();
 }

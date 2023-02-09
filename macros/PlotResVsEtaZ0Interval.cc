@@ -1,11 +1,31 @@
+#include "../include/Config.hh"
 #include "../include/ConfigBuilder.hh"
-#include "../include/SmallText.hh"
-#include "../include/Style.hh"
+#include "../include/PlotHelperFunctions.hh"
 
 
-void PlotResVsEtaZ0Interval() {
+void plot_resVsEta_z0_interval();
 
-  if(!configHasRun) gROOT->ProcessLine(".x ConfigBuilder.cc");
+
+void PlotResVsEtaZ0Interval(int sample = SAMPLE) {
+
+  if(sample == 0 || sample == -1) {
+    if(!stubKiller0Set) ConfigBuilder(0);
+    plot_resVsEta_z0_interval();
+  }
+
+  if(sample == 1 || sample == -1) {
+    if(!stubKiller1Set) ConfigBuilder(1);
+    plot_resVsEta_z0_interval();
+  }
+
+  if(sample == 2 || sample == -1) {
+    if(!biasRailSet) ConfigBuilder(2);
+    plot_resVsEta_z0_interval();
+  }
+}
+
+
+void plot_resVsEta_z0_interval() {
 
   SetPlotStyle();
 
@@ -15,14 +35,12 @@ void PlotResVsEtaZ0Interval() {
   h_ref_68->GetXaxis()->SetRangeUser(0.0, 2.4);
   h_ref_68->SetMinimum(0.0);
   h_ref_68->SetMaximum(2.0);
-  h_ref_68->SetMarkerSize(MARKER_SIZE);
   h_ref_68->SetMarkerStyle(20);
 
   TH1F* h_ref_90 = f_ref->Get<TH1F>("resVsEta_z0_90");
   h_ref_90->GetXaxis()->SetRangeUser(0.0, 2.4);
   h_ref_90->SetMinimum(0.0);
   h_ref_90->SetMaximum(2.0);
-  h_ref_90->SetMarkerSize(MARKER_SIZE);
   h_ref_90->SetMarkerStyle(24);
 
   for(int s = 0; s < F_FAILS.size(); s++) {
@@ -35,7 +53,6 @@ void PlotResVsEtaZ0Interval() {
     h_68->GetXaxis()->SetRangeUser(0.0, 2.4);
     h_68->SetMinimum(0.0);
     h_68->SetMaximum(2.0);
-    h_68->SetMarkerSize(MARKER_SIZE);
     h_68->SetMarkerStyle(21);
     h_68->SetMarkerColor(COLOR[s]);
     h_68->SetLineColor(COLOR[s]);
@@ -44,7 +61,6 @@ void PlotResVsEtaZ0Interval() {
     h_90->GetXaxis()->SetRangeUser(0.0, 2.4);
     h_90->SetMinimum(0.0);
     h_90->SetMaximum(2.0);
-    h_90->SetMarkerSize(MARKER_SIZE);
     h_90->SetMarkerStyle(25);
     h_90->SetMarkerColor(COLOR[s]);
     h_90->SetLineColor(COLOR[s]);
@@ -67,7 +83,7 @@ void PlotResVsEtaZ0Interval() {
 
     l1->Draw();
 
-    TLegend* l2 = new TLegend(0.5, 0.65, 0.75, 0.85);
+    TLegend* l2 = new TLegend(0.65, 0.65, 0.9, 0.85);
     l2->SetFillStyle(0);
     l2->SetBorderSize(0);
     l2->SetTextSize(0.04);
@@ -89,5 +105,7 @@ void PlotResVsEtaZ0Interval() {
 
     delete l1;
     delete l2;
+
+    f->Close();
   }
 }

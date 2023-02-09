@@ -1,11 +1,31 @@
+#include "../include/Config.hh"
 #include "../include/ConfigBuilder.hh"
-#include "../include/SmallText.hh"
-#include "../include/Style.hh"
+#include "../include/PlotHelperFunctions.hh"
 
 
-void PlotNTrkPt3() {
+void plot_ntrk_pt3();
 
-  if(!configHasRun) gROOT->ProcessLine(".x ConfigBuilder.cc");
+
+void PlotNTrkPt3(int sample = SAMPLE) {
+
+  if(sample == 0 || sample == -1) {
+    if(!stubKiller0Set) ConfigBuilder(0);
+    plot_ntrk_pt3();
+  }
+
+  if(sample == 1 || sample == -1) {
+    if(!stubKiller1Set) ConfigBuilder(1);
+    plot_ntrk_pt3();
+  }
+
+  if(sample == 2 || sample == -1) {
+    if(!biasRailSet) ConfigBuilder(2);
+    plot_ntrk_pt3();
+  }
+}
+
+
+void plot_ntrk_pt3() {
 
   std::string f_name;
 
@@ -15,12 +35,12 @@ void PlotNTrkPt3() {
 
   TH1F* h_ref = f_ref->Get<TH1F>("ntrk_pt3");
   h_ref->GetXaxis()->SetRangeUser(0.0, 320.0);
-  h_ref->Scale(1.0 / 9000.0);
+  h_ref->Scale(1.0 / N_EVENTS[0]);
   h_ref->GetYaxis()->SetTitle("Fraction of events");
-  h_ref->SetMarkerSize(MARKER_SIZE);
+  h_ref->SetMarkerSize(0.5);
   h_ref->SetMarkerStyle(20);
 
-  for(int i = 0; i < CASES.size(); i++) {
+  for(int i = 0; i < N_CASES.size(); i++) {
 
     TCanvas c;
 
@@ -34,15 +54,18 @@ void PlotNTrkPt3() {
 
     l->AddEntry(h_ref, LATEX_FAILS[0].c_str(), "pl");
 
-    for(auto& s : CASES[i].second) {
+    TFile* f;
+    std::vector<int> cases;
+    GetCases(CASES[i], cases);
+    for(auto& s : cases) {
 
-      TFile* f = TFile::Open(F_FAILS[s].c_str());
+      f = TFile::Open(F_FAILS[s].c_str());
 
       TH1F* h = f->Get<TH1F>("ntrk_pt3");
-      h->Scale(1.0 / 9000.0);
+      h->Scale(1.0 / N_EVENTS[s]);
       h->GetYaxis()->SetTitle("Fraction of events");
-      h->SetMarkerSize(MARKER_SIZE);
-      h->SetMarkerStyle(21);
+      h->SetMarkerSize(0.5);
+      h->SetMarkerStyle(20);
       h->SetMarkerColor(COLOR[s]);
       h->SetLineColor(COLOR[s]);
 
@@ -59,7 +82,7 @@ void PlotNTrkPt3() {
 
     MySmallText(0.7, 0.55, 1, LATEX_SAMPLE);
 
-    f_name = "../plots/" + N_SAMPLE + "_ntrk_pt3_" + CASES[i].first;
+    f_name = "../plots/" + N_SAMPLE + "_ntrk_pt3_" + N_CASES[i];
 
     gPad->SetLogy();
     c.SaveAs((f_name + "_log.pdf").c_str());
@@ -86,6 +109,8 @@ void PlotNTrkPt3() {
     }
 
     delete l;
+
+    f->Close();
   }
 
   if(DO_DETAILED_PLOTS) {
@@ -97,10 +122,10 @@ void PlotNTrkPt3() {
       TFile* f = TFile::Open(F_FAILS[s].c_str());
 
       TH1F* h = f->Get<TH1F>("ntrk_pt3");
-      h->Scale(1.0 / 9000.0);
+      h->Scale(1.0 / N_EVENTS[s]);
       h->GetYaxis()->SetTitle("Fraction of events");
-      h->SetMarkerSize(MARKER_SIZE);
-      h->SetMarkerStyle(21);
+      h->SetMarkerSize(0.5);
+      h->SetMarkerStyle(20);
       h->SetMarkerColor(COLOR[s]);
       h->SetLineColor(COLOR[s]);
 
@@ -153,6 +178,10 @@ void PlotNTrkPt3() {
       }
 
       delete l;
+
+      f->Close();
     }
   }
+
+  f_ref->Close();
 }

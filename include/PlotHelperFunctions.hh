@@ -1,5 +1,5 @@
-#ifndef STYLE
-#define STYLE
+#ifndef PLOT_HELPER_FUNCTIONS
+#define PLOT_HELPER_FUNCTIONS
 
 
 // from ATLAS plot style macro
@@ -46,7 +46,7 @@ void SetPlotStyle() {
 
   // use bold lines and markers
   gStyle->SetMarkerStyle(20);
-  gStyle->SetMarkerSize(1.2);
+  gStyle->SetMarkerSize(1.0); // default 1.2
   gStyle->SetHistLineWidth(2.0);
   gStyle->SetLineStyleString(2, "[12 12]");
 
@@ -61,6 +61,17 @@ void SetPlotStyle() {
   // put tick marks on top and RHS of plots
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
+}
+
+
+void MySmallText(Double_t x, Double_t y, Color_t color, std::string text) {
+
+  Double_t tsize = 0.044;
+  TLatex l;
+  l.SetTextSize(tsize);
+  l.SetNDC();
+  l.SetTextColor(color);
+  l.DrawLatex(x, y, text.c_str());
 }
 
 
