@@ -31,11 +31,11 @@ void plot_eff_eta() {
 
   SetPlotStyle();
 
-  TFile* f_ref = TFile::Open(F_REF.c_str());
+  TFile* f_ref = TFile::Open(F_FAILS[0].c_str());
 
   TH1F* h_ref = f_ref->Get<TH1F>("eff_eta");
-  h_ref->SetMinimum(0.0);
-  h_ref->SetMaximum(1.1);
+  h_ref->SetMinimum(EFF_ETA_MIN);
+  h_ref->SetMaximum(EFF_ETA_MAX);
 
   for(int i = 0; i < N_CASES.size(); i++) {
 
@@ -45,7 +45,7 @@ void plot_eff_eta() {
     p_eff->SetBottomMargin(0.0);
     p_eff->Draw();
 
-    TLegend* l = new TLegend(0.6, 0.25, 0.85, 0.55);
+    TLegend* l = new TLegend(EFF_LX1, EFF_LY1, EFF_LX2, EFF_LY2);
     l->SetFillStyle(0);
     l->SetBorderSize(0);
     l->SetTextSize(0.05);
@@ -69,16 +69,14 @@ void plot_eff_eta() {
       f = TFile::Open(F_FAILS[s].c_str());
 
       TH1F* h = f->Get<TH1F>("eff_eta");
-      h->SetMinimum(0.0);
-      h->SetMaximum(1.1);
       h->SetMarkerColor(COLOR[s]);
       h->SetLineColor(COLOR[s]);
 
       // Sumw2 already calculated
       TH1F* h_ratio = (TH1F*) h->Clone();
       h_ratio->Divide(h_ref);
-      h_ratio->SetMinimum(0.5);
-      h_ratio->SetMaximum(1.2);
+      h_ratio->SetMinimum(RATIO_MIN);
+      h_ratio->SetMaximum(RATIO_MAX);
       h_ratio->GetXaxis()->SetTitleSize(0.12);
       h_ratio->GetXaxis()->SetTitleOffset(1.0);
       h_ratio->GetXaxis()->SetLabelSize(0.12);
@@ -100,7 +98,7 @@ void plot_eff_eta() {
 
     p_eff->cd();
     l->Draw();
-    MySmallText(0.2, 0.5, 1, LATEX_SAMPLE);
+    MySmallText(EFF_TX, EFF_TY, 1, LATEX_SAMPLE);
     c->cd();
 
     gPad->SetGridy();
@@ -116,23 +114,23 @@ void plot_eff_eta() {
 
   if(DO_DETAILED_PLOTS) {
 
-    for(int s = 0; s < F_FAILS.size(); s++) {
+    for(int s = 1; s < F_FAILS.size(); s++) {
 
       if(F_FAILS[s].length() == 0) continue;
 
       TFile* f = TFile::Open(F_FAILS[s].c_str());
 
       TH1F* h = f->Get<TH1F>("eff_eta");
-      h->SetMinimum(0.0);
-      h->SetMaximum(1.1);
+      h->SetMinimum(EFF_ETA_MIN);
+      h->SetMaximum(EFF_ETA_MAX);
       h->SetMarkerColor(COLOR[s]);
       h->SetLineColor(COLOR[s]);
 
       // Sumw2 already calculated
       TH1F* h_ratio = (TH1F*) h->Clone();
       h_ratio->Divide(h_ref);
-      h_ratio->SetMinimum(0.5);
-      h_ratio->SetMaximum(1.2);
+      h_ratio->SetMinimum(RATIO_MIN);
+      h_ratio->SetMaximum(RATIO_MAX);
       h_ratio->GetXaxis()->SetTitleSize(0.12);
       h_ratio->GetXaxis()->SetTitleOffset(1.0);
       h_ratio->GetXaxis()->SetLabelSize(0.12);
@@ -148,7 +146,7 @@ void plot_eff_eta() {
       p_eff->SetBottomMargin(0.0);
       p_eff->Draw();
 
-      TLegend* l = new TLegend(0.6, 0.4, 0.85, 0.55);
+      TLegend* l = new TLegend(EFF_LX1, EFF_LY1, EFF_LX2, EFF_LY2);
       l->SetFillStyle(0);
       l->SetBorderSize(0);
       l->SetTextSize(0.05);
@@ -172,7 +170,7 @@ void plot_eff_eta() {
 
       p_eff->cd();
       l->Draw();
-      MySmallText(0.2, 0.5, 1, LATEX_SAMPLE);
+      MySmallText(EFF_TX, EFF_TY, 1, LATEX_SAMPLE);
       c->cd();
 
       gPad->SetGridy();

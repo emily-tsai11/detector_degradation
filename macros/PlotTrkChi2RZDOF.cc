@@ -31,7 +31,7 @@ void plot_trk_chi2rz_dof() {
 
   SetPlotStyle();
 
-  TFile* f_ref = TFile::Open(F_REF.c_str());
+  TFile* f_ref = TFile::Open(F_FAILS[0].c_str());
 
   TH1F* h_ref = f_ref->Get<TH1F>("trk_chi2rz_dof");
   h_ref->SetMarkerSize(0.0);
@@ -40,7 +40,7 @@ void plot_trk_chi2rz_dof() {
 
     TCanvas c;
 
-    TLegend* l = new TLegend(0.62, 0.68, 0.9, 0.9);
+    TLegend* l = new TLegend(TRK_LX1, TRK_LY1, TRK_LX2, TRK_LY2);
     l->SetFillStyle(0);
     l->SetBorderSize(0);
     l->SetTextSize(0.04);
@@ -59,8 +59,7 @@ void plot_trk_chi2rz_dof() {
       h->SetMarkerSize(0.0);
       h->SetLineColor(COLOR[s]);
       h->GetXaxis()->SetRangeUser(0.0, 2.2);
-      if(stubKiller0Set) h->SetMaximum(470000.0);
-      if(stubKiller1Set) h->SetMaximum(78000.0);
+      h->SetMaximum(TRK_CHI2RZDOF_MAX);
       h->GetXaxis()->SetTitle("L1 Track #chi^{2}_{r-z} / D.O.F.");
       h->GetYaxis()->SetTitle("# L1 Tracks / 0.2");
 
@@ -73,12 +72,11 @@ void plot_trk_chi2rz_dof() {
 
     l->Draw();
 
-    c.SetRightMargin(0.09);
     c.SetLeftMargin(0.15);
     c.SetTopMargin(0.06);
     c.SetBottomMargin(0.15);
 
-    MySmallText(0.7, 0.55, 1, LATEX_SAMPLE);
+    MySmallText(TX, TY, 1, LATEX_SAMPLE);
 
     f_name = "../plots/" + N_SAMPLE + "_trk_chi2rz_dof_" + N_CASES[i] + ".pdf";
     c.SaveAs(f_name.c_str());
@@ -91,12 +89,11 @@ void plot_trk_chi2rz_dof() {
   if(DO_DETAILED_PLOTS) {
 
     h_ref->GetXaxis()->SetRangeUser(0.0, 2.2);
-    if(stubKiller0Set) h_ref->SetMaximum(470000.0);
-    if(stubKiller1Set) h_ref->SetMaximum(78000.0);
+    h_ref->SetMaximum(TRK_CHI2RZDOF_MAX);
     h_ref->GetXaxis()->SetTitle("L1 Track #chi^{2}_{r-z} / D.O.F.");
     h_ref->GetYaxis()->SetTitle("# L1 Tracks / 0.2");
 
-    for(int s = 0; s < F_FAILS.size(); s++) {
+    for(int s = 1; s < F_FAILS.size(); s++) {
 
       if(F_FAILS[s].length() == 0) continue;
 
@@ -111,7 +108,7 @@ void plot_trk_chi2rz_dof() {
       h_ref->Draw("hist,e");
       h->Draw("hist,e,same");
 
-      TLegend* l = new TLegend(0.62, 0.68, 0.9, 0.9);
+      TLegend* l = new TLegend(TRK_LX1, TRK_LY1, TRK_LX2, TRK_LY2);
       l->SetFillStyle(0);
       l->SetBorderSize(0);
       l->SetTextSize(0.04);
@@ -122,12 +119,11 @@ void plot_trk_chi2rz_dof() {
 
       l->Draw();
 
-      c.SetRightMargin(0.09);
       c.SetLeftMargin(0.15);
       c.SetTopMargin(0.06);
       c.SetBottomMargin(0.15);
 
-      MySmallText(0.7, 0.55, 1, LATEX_SAMPLE);
+      MySmallText(TX, TY, 1, LATEX_SAMPLE);
 
       f_name = "../plots/" + N_SAMPLE + "_trk_chi2rz_dof_" + N_SAVE + std::to_string(s) + ".pdf";
       c.SaveAs(f_name.c_str());

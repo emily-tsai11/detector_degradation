@@ -29,7 +29,7 @@ void plot_resVsEta_z0_interval() {
 
   SetPlotStyle();
 
-  TFile* f_ref = TFile::Open(F_REF.c_str());
+  TFile* f_ref = TFile::Open(F_FAILS[0].c_str());
 
   TH1F* h_ref_68 = f_ref->Get<TH1F>("resVsEta_z0_68");
   h_ref_68->GetXaxis()->SetRangeUser(0.0, 2.4);
@@ -43,7 +43,7 @@ void plot_resVsEta_z0_interval() {
   h_ref_90->SetMaximum(2.0);
   h_ref_90->SetMarkerStyle(24);
 
-  for(int s = 0; s < F_FAILS.size(); s++) {
+  for(int s = 1; s < F_FAILS.size(); s++) {
 
     if(F_FAILS[s].length() == 0) continue;
 
@@ -98,7 +98,7 @@ void plot_resVsEta_z0_interval() {
     c.SetLeftMargin(0.15);
     c.SetBottomMargin(0.15);
 
-    MySmallText(0.2, 0.55, 1, LATEX_SAMPLE);
+    MySmallText(EFF_TX, EFF_TY, 1, LATEX_SAMPLE);
 
     std::string f_name = "../plots/" + N_SAMPLE + "_resVsEta_z0_interval_" + N_SAVE + std::to_string(s) + ".pdf";
     c.SaveAs(f_name.c_str());
