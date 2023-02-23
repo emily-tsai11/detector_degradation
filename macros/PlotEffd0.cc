@@ -19,7 +19,12 @@ void PlotEffD0(int sample = SAMPLE) {
   }
 
   if(sample == 2 || sample == -1) {
-    if(!biasRailSet) ConfigBuilder(2);
+    if(!biasRail2Set) ConfigBuilder(2);
+    plot_eff_d0();
+  }
+
+  if(sample == 3 || sample == -1) {
+    if(!biasRail3Set) ConfigBuilder(3);
     plot_eff_d0();
   }
 }
@@ -36,6 +41,7 @@ void plot_eff_d0() {
   TH1F* h_ref = f_ref->Get<TH1F>("eff_d0");
   h_ref->SetMinimum(EFF_D0_MIN);
   h_ref->SetMaximum(EFF_D0_MAX);
+  h_ref->GetXaxis()->SetRangeUser(-0.5, 0.5);
 
   for(int i = 0; i < N_CASES.size(); i++) {
 
@@ -45,7 +51,7 @@ void plot_eff_d0() {
     p_eff->SetBottomMargin(0.0);
     p_eff->Draw();
 
-    TLegend* l = new TLegend(0.69, 0.2, 0.83, 0.5);
+    TLegend* l = new TLegend(0.45, 0.15, 0.65, 0.45);
     l->SetFillStyle(0);
     l->SetBorderSize(0);
     l->SetTextSize(0.05);
@@ -75,6 +81,7 @@ void plot_eff_d0() {
       // Sumw2 already calculated
       TH1F* h_ratio = (TH1F*) h->Clone();
       h_ratio->Divide(h_ref);
+      h_ratio->GetXaxis()->SetRangeUser(-0.5, 0.5);
       h_ratio->SetMinimum(0.0);
       h_ratio->SetMaximum(RATIO_MAX);
       h_ratio->GetXaxis()->SetTitleSize(0.12);
@@ -146,7 +153,7 @@ void plot_eff_d0() {
       p_eff->SetBottomMargin(0.0);
       p_eff->Draw();
 
-      TLegend* l = new TLegend(0.69, 0.2, 0.83, 0.5);
+      TLegend* l = new TLegend(0.45, 0.15, 0.65, 0.45);
       l->SetFillStyle(0);
       l->SetBorderSize(0);
       l->SetTextSize(0.05);

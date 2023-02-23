@@ -6,7 +6,9 @@ for dir in *; do
     rootFile=$(echo "$dir" | awk -F '_f' '{print $1}' )
     cd $dir
     echo -----------------------------------------------------------------------
-    time ./../makeHists.csh $rootFile.root
+    if [[ $rootFile == *"TRK2026D88PU200MB2_noTPStubCut"* ]]; then
+      time ./../makeHists.csh $rootFile.root
+    fi
     cd ..
   fi
 done

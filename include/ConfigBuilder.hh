@@ -38,7 +38,7 @@ double EFF_ETA_MIN = 0.65;
 double EFF_ETA_MAX = 1.05;
 
 // PlotEffPt
-double EFF_PT_MIN = 0.45;
+double EFF_PT_MIN = 0.40;
 double EFF_PT_MAX = 1.05;
 
 // PlotEffD0
@@ -80,13 +80,14 @@ double TY = 0.95;
 
 bool stubKiller0Set = 0;
 bool stubKiller1Set = 0;
-bool biasRailSet = 0;
+bool biasRail2Set = 0;
+bool biasRail3Set = 0;
 
 
 void ClearConfig();
 void DefineStubKillerConstants(int s);
-void DefineBiasRailConstants();
-void GetCases();
+void DefineBiasRailConstants(int s);
+void GetCases(std::string& s, std::vector<int>& cases);
 
 
 void ConfigBuilder(int sample) {
@@ -94,7 +95,7 @@ void ConfigBuilder(int sample) {
   ClearConfig();
 
   if(sample == 0 || sample == 1) DefineStubKillerConstants(sample);
-  else if(sample == 2) DefineBiasRailConstants();
+  else if(sample == 2 || sample == 3) DefineBiasRailConstants(sample);
 }
 
 
@@ -134,7 +135,8 @@ void DefineStubKillerConstants(int s) {
 
     stubKiller0Set = 1;
     stubKiller1Set = 0;
-    biasRailSet = 0;
+    biasRail2Set = 0;
+    biasRail3Set = 0;
   }
   else if(s == 1) {
 
@@ -159,7 +161,8 @@ void DefineStubKillerConstants(int s) {
 
     stubKiller0Set = 0;
     stubKiller1Set = 1;
-    biasRailSet = 0;
+    biasRail2Set = 0;
+    biasRail3Set = 0;
   }
 
   F_FAILS = {
@@ -190,15 +193,11 @@ void DefineStubKillerConstants(int s) {
   N_EVENTS = {9000, 9000, 9000, 9000, 9000, 9000, 9000, 9000, 9000, 9000};
 
   N_CASES = {
-    "1loss",
-    "5loss",
     "killL1",
     "killL5",
     "ploss"
   };
   CASES = {
-    "6_8_7",
-    "5_2_1",
     "8_2_3_4",
     "7_1",
     "6_5_9"
@@ -210,10 +209,28 @@ void DefineStubKillerConstants(int s) {
 }
 
 
-void DefineBiasRailConstants() {
+void DefineBiasRailConstants(int s) {
 
-  N_SAMPLE = "TRK2026D88PU200MB2";
   LATEX_SAMPLE = "t#bar{t}, PU 200, D88";
+
+  if(s == 2) {
+
+    N_SAMPLE = "TRK2026D88PU200MB2";
+
+    stubKiller0Set = 0;
+    stubKiller1Set = 0;
+    biasRail2Set = 1;
+    biasRail3Set = 0;
+  }
+  else if(s == 3) {
+
+    N_SAMPLE = "TRK2026D88PU200MB2_noTPStubCut";
+
+    stubKiller0Set = 0;
+    stubKiller1Set = 0;
+    biasRail2Set = 0;
+    biasRail3Set = 1;
+  }
 
   F_FAILS = { // F_FAILS[1] not used
     "../results/" + N_SAMPLE + "-v1_f0e8600/output_" + N_SAMPLE + "-v1.root",
@@ -260,10 +277,6 @@ void DefineBiasRailConstants() {
   TRK_CHI2RZ_MAX = 320000;
   TRK_CHI2RZDOF_MAX = 470000;
   TRK_BENDCHI2_MAX = 280000;
-
-  stubKiller0Set = 0;
-  stubKiller1Set = 0;
-  biasRailSet = 1;
 }
 
 

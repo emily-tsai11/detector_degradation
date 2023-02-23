@@ -19,7 +19,12 @@ void PlotEffPhi(int sample = SAMPLE) {
   }
 
   if(sample == 2 || sample == -1) {
-    if(!biasRailSet) ConfigBuilder(2);
+    if(!biasRail2Set) ConfigBuilder(2);
+    plot_eff_phi();
+  }
+
+  if(sample == 3 || sample == -1) {
+    if(!biasRail3Set) ConfigBuilder(3);
     plot_eff_phi();
   }
 }

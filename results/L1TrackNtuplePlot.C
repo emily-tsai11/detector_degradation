@@ -3178,6 +3178,11 @@ void L1TrackNtuplePlot(TString type,
     c.SaveAs(DIR + type + "_eff_absd0_eta2_pt3.pdf");
   }
 
+  h_match_tp_eta->Write();
+  h_tp_eta->Write();
+  h_match_tp_pt->Write();
+  h_tp_pt->Write();
+
   gPad->SetGridx(0);
   gPad->SetGridy(0);
 

@@ -40,6 +40,7 @@ void plot_ntrk_pt3() {
   h_ref->GetYaxis()->SetTitle("Fraction of events");
   h_ref->SetMarkerSize(0.5);
   h_ref->SetMarkerStyle(20);
+  h_ref->GetXaxis()->SetTitle("# L1 tracks (p_{T} > 3 GeV) / event");
 
   for(int i = 0; i < N_CASES.size(); i++) {
 
