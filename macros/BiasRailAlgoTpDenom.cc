@@ -8,17 +8,7 @@ void make_eff_eta_plots();
 void make_eff_pt_plots();
 
 
-void AlgoTpDenom(int sample = SAMPLE) {
-
-  // if(sample == 0 || sample == -1) {
-  //   if(!stubKiller0Set) ConfigBuilder(0);
-  //   check_tp_denom();
-  // }
-
-  // if(sample == 1 || sample == -1) {
-  //   if(!stubKiller1Set) ConfigBuilder(1);
-  //   check_tp_denom();
-  // }
+void BiasRailAlgoTpDenom(int sample = SAMPLE) {
 
   if(sample == 2 || sample == -1) {
     if(!biasRail2Set) ConfigBuilder(2);
@@ -26,11 +16,9 @@ void AlgoTpDenom(int sample = SAMPLE) {
     // make_eff_eta_plots();
     // make_eff_pt_plots();
   }
-
-  // if(sample == 3 || sample == -1) {
-  //   if(!biasRail3Set) ConfigBuilder(3);
-  //   check_tp_denom();
-  // }
+  else {
+    std::cout << "Invalid sample! Exiting." << std::endl;
+  }
 }
 
 
@@ -95,54 +83,6 @@ void check_tp_denom() {
   std::cout << "bias rail + 10% bad strips : " << txt << std::endl;
 
   std::cout << std::endl;
-
-  // TCanvas* c_match_tp_eta = new TCanvas("c_match_tp_eta", "c_match_tp_eta", 800, 600);
-  // 
-  // TLegend* l = new TLegend(0.4, 0.2, 0.6, 0.5);
-  // l->SetFillStyle(0);
-  // l->SetBorderSize(0);
-  // l->SetTextSize(0.04);
-  // l->SetTextFont(42);
-  // 
-  // TH1F* h_match_tp_eta_v1 = f->Get<TH1F>("match_tp_eta");
-  // h_match_tp_eta_v1->Draw("p");
-  // l->AddEntry(h_match_tp_eta_v1, LATEX_FAILS[0].c_str(), "pl");
-  // 
-  // TFile* f5 = TFile::Open("../results/TRK2026D88PU200MB2-v5_f0e9000/output_TRK2026D88PU200MB2-v5.root");
-  // TH1F* h_match_tp_eta_v5 = f5->Get<TH1F>("match_tp_eta");
-  // h_match_tp_eta_v5->Draw("p,same");
-  // h_match_tp_eta_v5->SetMarkerColor(COLOR[5]);
-  // h_match_tp_eta_v5->SetLineColor(COLOR[5]);
-  // l->AddEntry(h_match_tp_eta_v5, LATEX_FAILS[5].c_str(), "pl");
-  // 
-  // TFile* f2 = TFile::Open("../results/TRK2026D88PU200MB2-v2_f0e9000/output_TRK2026D88PU200MB2-v2.root");
-  // TH1F* h_match_tp_eta_v2 = f2->Get<TH1F>("match_tp_eta");
-  // h_match_tp_eta_v2->Draw("p,same");
-  // h_match_tp_eta_v2->SetMarkerColor(COLOR[2]);
-  // h_match_tp_eta_v2->SetLineColor(COLOR[2]);
-  // l->AddEntry(h_match_tp_eta_v2, LATEX_FAILS[2].c_str(), "pl");
-  // 
-  // TFile* f3 = TFile::Open("../results/TRK2026D88PU200MB2-v3_f0e8800/output_TRK2026D88PU200MB2-v3.root");
-  // TH1F* h_match_tp_eta_v3 = f3->Get<TH1F>("match_tp_eta");
-  // h_match_tp_eta_v3->Draw("p,same");
-  // h_match_tp_eta_v3->SetMarkerColor(COLOR[3]);
-  // h_match_tp_eta_v3->SetLineColor(COLOR[3]);
-  // l->AddEntry(h_match_tp_eta_v3, LATEX_FAILS[3].c_str(), "pl");
-  // 
-  // TFile* f4 = TFile::Open("../results/TRK2026D88PU200MB2-v4_f0e9000/output_TRK2026D88PU200MB2-v4.root");
-  // TH1F* h_match_tp_eta_v4 = f4->Get<TH1F>("match_tp_eta");
-  // h_match_tp_eta_v4->Draw("p,same");
-  // h_match_tp_eta_v4->SetMarkerColor(COLOR[4]);
-  // h_match_tp_eta_v4->SetLineColor(COLOR[4]);
-  // l->AddEntry(h_match_tp_eta_v4, LATEX_FAILS[4].c_str(), "pl");
-  // 
-  // l->Draw();
-  // 
-  // gPad->SetGridy();
-  // c_match_tp_eta->SaveAs("../plots/TRK2026D88PU200MB2_match_tp_eta_ploss.pdf");
-  // gPad->SetGridy(0);
-  // 
-  // delete l;
 }
 
 
